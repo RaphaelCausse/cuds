@@ -1,0 +1,12 @@
+# cuds.pc - pkg-config file for the C Utilities and Data Structures library
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: cuds
+Description: C Utilities and Data Structures library
+Version: 0.1.0
+Libs: -L${libdir} -lcuds
+Cflags: -I${includedir}/cuds
