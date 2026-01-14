@@ -10,11 +10,13 @@ CUDS is a C library providing generic data structures, common utilities, and hel
 1. [Project Structure](#project-structure)  
 2. [Requirements](#requirements)
 3. [Modules](#modules)
-4. [Build](#build)  
-5. [Install](#install)
-6. [Usage](#usage)
-7. [Clean](#clean)
-8. [Authors](#authors)
+4. [Configuration](#configuration)
+5. [Build](#build)  
+6. [Install](#install)
+7. [Usage](#usage)
+8. [Tests](#tests)
+9. [Clean](#clean)
+10. [Authors](#authors)
 
 ---
 
@@ -50,14 +52,14 @@ cuds/
 
 ## Requirements
 
-- C99-compatible compiler  
-    - GCC, Clang, or MSVC (with C99 support)
-- Meson
+- C99-compatible compiler (GCC, Clang, or MSVC)
+- Python (>= 3.8)
+- Meson (>= 0.60.0)
 - Ninja
 
 ### Installation of Meson and Ninja (via Python)
 
-Meson and Ninja can be installed using Python (>= 3.8) and pip, which is the recommended and most portable method.
+Meson and Ninja can be installed using Python and pip, which is the recommended and most portable method.
 ```shell
 python --version
 pip --version
@@ -83,29 +85,29 @@ Each module:
 ---
 
 
-## Build
-
-Meson uses out-of-tree builds.
+## Configuration
 
 Configure the build, at the root of the project :
 ```shell
 # Default build in release
-meson setup build
+meson setup <build_dir>
 ```
 
 You can configure multiple build directories, depending on the build type :
 ```shell
-# Others build types, in different build directories
-meson setup build --buildtype=release
-# or 
-meson setup build-debug --buildtype=debug
+meson setup <build_debug_dir> --buildtype=debug
 # or
-meson setup build-debug-opti --buildtype=debugoptimized
+meson setup <build_debug_dir> --buildtype=debugoptimized
 ```
+
+---
+
+
+## Build
 
 Compile the project, by specifying the build directory :
 ```shell
-meson compile -C build
+meson compile -C <build_dir>
 ```
 
 By default, this builds both the static and the shared library (depending on `default_library` configuration).
@@ -117,21 +119,21 @@ By default, this builds both the static and the shared library (depending on `de
 
 Install the library and public headers using Meson, by specifying the build directory :
 ```shell
-meson install -C build
+meson install -C <build_dir>
 ```
 
 You can customize the install destination dir :
 ```shell
 # With option
-meson install -C build --destdir=<path/to/install>
+meson install -C <build_dir> --destdir=<path/to/install>
 
-# or with envvar
-DESTDIR=<path/to/install> meson install -C build
+# or with environment variable
+DESTDIR=<path/to/install> meson install -C <build_dir>
 
 # or with prefix at setup
-meson setup build --prefix=<path/to/install>
-meson compile -C build
-meson install -C build
+meson setup <build_debug_dir> --prefix=<path/to/install>
+meson compile -C <build_dir>
+meson install -C <build_dir>
 ```
 
 This installs :
@@ -143,7 +145,7 @@ This installs :
     - <destdir|prefix>/include/cuds/*.h
 
 **Notes** :
-On Windows, the .dll and import .lib are installed in `<destdir|prefix>/bin` and `<destdir|prefix>/lib`.
+- On Windows, the .dll and import .lib are installed in `<destdir|prefix>/bin` and `<destdir|prefix>/lib`.
 
 ---
 
@@ -159,18 +161,38 @@ After building or installing :
 ...
 ```
 2. Add compiler and linker flags :
-
-Add compiler and linker flags to your build :
 ```shell
 # Include path
--I <path/to/install>/include
-
+-I<path/to/install>/include
 # Libraries path
--L <path/to/install>/lib
-
+-L<path/to/install>/lib
 # Link library
 -lcuds
 ```
+
+---
+
+
+## Tests
+
+Build all tests :
+```shell
+meson compile -C <build_dir>
+```
+
+Run all tests :
+```shell
+meson test -C <build_dir>
+```
+
+Run a single test :
+```shell
+meson test -C <build_dir> <test_name>
+```
+
+**Notes** :
+- All tests are compiled with the current build type.
+- The stdout of passing tests is normally hidden; to see it, use `--verbose` or run the executable directly:
 
 ---
 
@@ -179,14 +201,14 @@ Add compiler and linker flags to your build :
 
 Remove build artifacts :
 ```shell
-meson compile -C build --clean
+meson compile -C <build_dir> --clean
 ```
 
-To completely reset the build directory, delete the `build/` directory the reconfigure (see [build](#build)) :
+To completely reset the build directory, delete it and then reconfigure the build (see [build](#build)) :
 ```shell
-rm -rf build/
+rm -rf <build_dir>
 
-meson setup build
+meson setup <build_dir>
 ```
 
 ---
