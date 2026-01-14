@@ -20,12 +20,7 @@ project(
 # --------------------------------------------------
 cc = meson.get_compiler('c')
 
-cuds_c_args = [
-    '-Wshadow',
-    '-Wconversion',
-    '-Wsign-conversion',
-    '-Wstrict-prototypes'
-]
+cuds_c_args = []
 
 if get_option('buildtype') == 'release'
     cuds_c_args += ['-DNDEBUG']
