@@ -166,24 +166,24 @@ These samples show how to :
 
 ## Tests
 
-Build all tests :
+Build a single test :
 ```shell
-meson compile -C <build_dir>
+meson compile -C <build_dir> <test_name>
 ```
 
-Run all tests :
-```shell
-meson test -C <build_dir>
-```
-
-Run a single test :
+Build and run a single test :
 ```shell
 meson test -C <build_dir> <test_name>
 ```
 
+Build and run all tests :
+```shell
+meson test -C <build_dir>
+```
+
 **Notes** :
 - All tests are compiled with the current build type.
-- The stdout of passing tests is normally hidden; to see it, use `--verbose` or run the executable directly:
+- The stdout of passing tests is normally hidden; to see it, use `--verbose` or run the executable directly
 
 ---
 
