@@ -117,34 +117,34 @@ By default, this builds both the static and the shared library (depending on `de
 
 ## Install
 
-Install the library and public headers using Meson, by specifying the build directory :
+Install the library and public headers using default installation path (see **Notes** below):
 ```shell
 meson install -C <build_dir>
 ```
 
-You can customize the install destination dir :
+You can customize the installation path :
 ```shell
-# With option
+# Using destination directory
 meson install -C <build_dir> --destdir=<path/to/install>
 
 # or with environment variable
 DESTDIR=<path/to/install> meson install -C <build_dir>
 
 # or with prefix at setup
-meson setup <build_debug_dir> --prefix=<path/to/install>
+meson setup <build_dir> --prefix=<path/to/install>
 meson compile -C <build_dir>
 meson install -C <build_dir>
 ```
 
 This installs :
 * Libraries :
-    - <destdir|prefix>/lib/libcuds.a (static)
-    - <destdir|prefix>/lib/libcuds.so (shared)
-
+    - `<destdir|prefix>/lib/libcuds.a` (static)
+    - `<destdir|prefix>/lib/libcuds.so` (shared)
 * Public headers :
-    - <destdir|prefix>/include/cuds/*.h
+    - `<destdir|prefix>/include/cuds/*.h`
 
 **Notes** :
+- Option `prefix` defaults to `C:/` on Windows and `/usr/local` otherwise.
 - On Windows, the .dll and import .lib are installed in `<destdir|prefix>/bin` and `<destdir|prefix>/lib`.
 
 ---
@@ -152,23 +152,14 @@ This installs :
 
 ## Usage
 
-After building or installing :
+### Sample projects using Meson
 
-1. Include the headers in your project :
-```c
-#include "cuds/cuds.h"      // Main header
-#include "cuds/version.h"   // Specific module header
-...
-```
-2. Add compiler and linker flags :
-```shell
-# Include path
--I<path/to/install>/include
-# Libraries path
--L<path/to/install>/lib
-# Link library
--lcuds
-```
+Example projects demonstrating how to use CUDS are available in the [sample/](sample/) directory.
+
+These samples show how to :
+- Configure projects using Meson
+- Include CUDS public headers
+- Link against the CUDS static or shared library
 
 ---
 
