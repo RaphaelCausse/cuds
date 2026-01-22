@@ -1,10 +1,11 @@
-cuds_public_headers = files(
+cuds_headers = files(
     'cuds/cuds.h',
     'cuds/version.h',
+    'cuds/value.h'
 )
 
 install_headers(
-    cuds_public_headers,
+    cuds_headers,
     subdir : meson.project_name()
 )
 
