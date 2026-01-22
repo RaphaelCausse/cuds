@@ -1,0 +1,14 @@
+/******************************************************************************
+ * \file revision.c
+ * \author Raphael CAUSSE (raphael.causse2@gmail.com)
+ * \brief Build-time source revision information for the CUDS library.
+ *
+ * This file is used as a template by the Meson build system to generate
+ * a source file embedding the source control revision string into the
+ * compiled CUDS library.
+ *
+ * The generated file defines the public symbol ::CUDS_REVISION, which
+ * identifies the source revision used at build time.
+ *****************************************************************************/
+ 
+const char *CUDS_REVISION = "@VCS_TAG@";

@@ -4,25 +4,31 @@
  * \brief Public header for CUDS library version module.
  *****************************************************************************/
 
-#ifndef _CUDS_VERSION_H_
-#define _CUDS_VERSION_H_
+#ifndef CUDS_VERSION_H
+#define CUDS_VERSION_H
+
+//-----------------------------------------------------------------------------
+// Includes
+//-----------------------------------------------------------------------------
+
+#include <stdint.h>
 
 //-----------------------------------------------------------------------------
 // Version components
 //-----------------------------------------------------------------------------
 
 /**
- * The current major version of CUDS headers.
+ * \brief The current major version of CUDS headers.
  */
 #define CUDS_VERSION_MAJOR 0
 
 /**
- * The current minor version of CUDS headers.
+ * \brief The current minor version of CUDS headers.
  */
 #define CUDS_VERSION_MINOR 0
 
 /**
- * The current patch version of CUDS headers.
+ * \brief The current patch version of CUDS headers.
  */
 #define CUDS_VERSION_PATCH 0
 
@@ -31,35 +37,44 @@
 //-----------------------------------------------------------------------------
 
 /**
- * Turn version numbers into a numeric value.
+ * \brief Pack version components into a 32-bit numeric value.
  */
 #define CUDS_VERSIONNUM(major, minor, patch) \
-    ((major) * 1000000 + (minor) * 1000 + (patch))
+    (((uint32_t)(major) << 16) |             \
+     ((uint32_t)(minor) << 8) |              \
+     ((uint32_t)(patch)))
 
 /**
- * Extract the major version from a numeric version.
+ * \brief Extract the major version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MAJOR(version) \
-    ((version) / 1000000)
+    (((version) >> 16) & 0xFF)
 
 /**
- * Extract the minor version from a numeric version.
+ * \brief Extract the minor version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MINOR(version) \
-    (((version) / 1000) % 1000)
+    (((version) >> 8) & 0xFF)
 
 /**
- * Extract the patch version from a numeric version.
+ * \brief Extract the patch version from a numeric version.
  */
 #define CUDS_VERSIONNUM_PATCH(version) \
-    ((version) % 1000)
+    ((version) & 0xFF)
 
 //-----------------------------------------------------------------------------
-// Current version
+// String version helpers
+//-----------------------------------------------------------------------------
+
+#define CUDS_STRINGIFY_HELPER(x) #x
+#define CUDS_STRINGIFY(x) CUDS_STRINGIFY_HELPER(x)
+
+//-----------------------------------------------------------------------------
+// Current version and revision
 //-----------------------------------------------------------------------------
 
 /**
- * Numeric version of the current CUDS headers.
+ * \brief Numeric version of the current CUDS headers.
  */
 #define CUDS_VERSION                    \
     CUDS_VERSIONNUM(CUDS_VERSION_MAJOR, \
@@ -67,10 +82,27 @@
                     CUDS_VERSION_PATCH)
 
 /**
- * Evaluate to true if CUDS is at least of version X.Y.Z.
+ * \brief Human-readable version string of the CUDS headers.
+ *
+ * The format is "MAJOR.MINOR.PATCH".
+ */
+#define CUDS_VERSION_STRING \
+    (CUDS_STRINGIFY(CUDS_VERSION_MAJOR) "." CUDS_STRINGIFY(CUDS_VERSION_MINOR) "." CUDS_STRINGIFY(CUDS_VERSION_PATCH))
+
+/**
+ * \brief Evaluate to true if CUDS is at least of version X.Y.Z.
  */
 #define CUDS_VERSION_ATLEAST(x, y, z) \
     (CUDS_VERSION >= CUDS_VERSIONNUM((x), (y), (z)))
+
+/**
+ * \brief Source control revision string of the CUDS library.
+ *
+ * This string is embedded into the compiled library at build time and
+ * identifies the source revision used to produce the binary (for example
+ * a Git commit hash).
+ */
+extern const char *CUDS_REVISION;
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -79,12 +111,11 @@
 /**
  * \brief Get the version of CUDS that is linked against your program.
  * \return Numeric version of CUDS.
- *
  * \note If you are linking to CUDS dynamically, then it is possible that the current
  * version will be different than the version you compiled against. This
  * function returns the current version, while CUDS_VERSION is the version you
  * compiled with.
  */
-extern int cuds_version_get(void);
+extern int cuds_version(void);
 
-#endif /* _CUDS_VERSION_H_ */
+#endif /* CUDS_VERSION_H */

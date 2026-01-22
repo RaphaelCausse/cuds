@@ -1,7 +1,7 @@
 /******************************************************************************
- * \file cuds.c
+ * \file version.c
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Implementation for CUDS library.
+ * \brief Implementation for CUDS library version module.
  *****************************************************************************/
 
 //-----------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 // Functions
 //-----------------------------------------------------------------------------
 
-int cuds_version_get(void)
+int cuds_version(void)
 {
     return CUDS_VERSION;
 }

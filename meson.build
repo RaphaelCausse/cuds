@@ -1,5 +1,5 @@
 # --------------------------------------------------
-# Meson Build File for CUDS Library
+# Meson Build file for CUDS Library
 # --------------------------------------------------
 project(
     'cuds',
@@ -24,7 +24,7 @@ cuds_c_args = []
 
 if get_option('buildtype') == 'release'
     cuds_c_args += ['-DNDEBUG']
-elif get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized' 
+else
     cuds_c_args += ['-DDEBUG']
 endif
 

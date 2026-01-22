@@ -4,8 +4,8 @@
  * \brief Main public header for CUDS library.
  *****************************************************************************/
 
-#ifndef _CUDS_H_
-#define _CUDS_H_
+#ifndef CUDS_H
+#define CUDS_H
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -13,4 +13,4 @@
 
 #include "version.h"
 
-#endif /* _CUDS_H_ */
+#endif /* CUDS_H */
