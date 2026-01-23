@@ -1,3 +1,6 @@
+# --------------------------------------------------
+# Meson Build file for sample project cuds-intro
+# --------------------------------------------------
 project(
     'cuds-intro',
     'c',
@@ -10,17 +13,38 @@ project(
     ]
 )
 
+# --------------------------------------------------
+# Build options
+# --------------------------------------------------
 cc = meson.get_compiler('c')
 
+c_args = []
+
+if get_option('buildtype') == 'release'
+    c_args += ['-DNDEBUG']
+else
+    c_args += ['-DDEBUG']
+endif
+
+add_project_arguments(
+    cc.get_supported_arguments(c_args),
+    language : 'c'
+)
+
+# --------------------------------------------------
+# Source files
+# --------------------------------------------------
 source_files = files(
     'src/main.c',
     'src/hello.c',
 )
 
-cuds_prefix = get_option('prefix')
-
-cuds_inc_dir = include_directories(join_paths(cuds_prefix, 'include'))
-cuds_lib_dir = join_paths(cuds_prefix, 'lib')
+# --------------------------------------------------
+# Includes and libraries
+# --------------------------------------------------
+cuds_install_path = get_option('cuds_install_path')
+cuds_inc_dir = include_directories(join_paths(cuds_install_path, 'include'))
+cuds_lib_dir = join_paths(cuds_install_path, 'lib')
 
 cuds_lib = cc.find_library(
     'cuds',
@@ -28,6 +52,9 @@ cuds_lib = cc.find_library(
     required : true
 )
 
+# --------------------------------------------------
+# Executable
+# --------------------------------------------------
 executable(
     meson.project_name(),
     source_files,
