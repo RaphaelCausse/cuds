@@ -131,6 +131,16 @@ meson install -C <build_dir>
 ```
 
 You can configure the installation path at setup with the `prefix` option (see **Notes**).
+```shell
+meson setup <build_dir> --prefix=<path/to/install>
+
+# If project already setup, you might need to reconfigure it
+meson setup <build_dir> --prefix=<path/to/install> --reconfigure
+
+# Then compile, and install
+meson compile -C <build_dir>
+meson install -C <build_dir>
+```
 
 You can override the installation path with `destdir` option (will override the `prefix` option) :
 ```shell
