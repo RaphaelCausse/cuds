@@ -4,15 +4,15 @@
 project(
     'cuds',
     'c',
-    version : '0.0.0',
+    version: '0.0.0',
     license: ['MIT'],
-    meson_version : '>=0.60.0',
-    default_options : [
+    meson_version: '>=0.60.0',
+    default_options: [
         'c_std=c99',
         'warning_level=3',
         'default_library=both',
-        'buildtype=release'
-    ]
+        'buildtype=release',
+    ],
 )
 
 # --------------------------------------------------
@@ -28,10 +28,7 @@ else
     cuds_c_args += ['-DDEBUG']
 endif
 
-add_project_arguments(
-    cc.get_supported_arguments(cuds_c_args),
-    language : 'c'
-)
+add_project_arguments(cc.get_supported_arguments(cuds_c_args), language: 'c')
 
 # --------------------------------------------------
 # Source files
@@ -45,9 +42,9 @@ subdir('src')
 cuds_lib = library(
     meson.project_name(),
     cuds_sources,
-    version : meson.project_version(),
-    include_directories : cuds_includedir,
-    install : true
+    version: meson.project_version(),
+    include_directories: cuds_includedir,
+    install: true,
 )
 
 # --------------------------------------------------
@@ -61,9 +58,9 @@ subdir('tests')
 pkg = import('pkgconfig')
 
 pkg.generate(
-  libraries : cuds_lib,
-  version : meson.project_version(),
-  name : meson.project_name(),
-  description : 'C Utilities and Data Structures library',
-  subdirs : meson.project_name()
+    libraries: cuds_lib,
+    version: meson.project_version(),
+    name: meson.project_name(),
+    description: 'C Utilities and Data Structures library',
+    subdirs: meson.project_name(),
 )

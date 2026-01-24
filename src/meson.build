@@ -1,8 +1,8 @@
 cuds_sources = files()
 
 cuds_modules = {
-    'value' : ['value.c'],
-    'version' : ['version.c'],
+    'value': ['value.c'],
+    'version': ['version.c'],
 }
 
 foreach module, source_list : cuds_modules
@@ -11,7 +11,7 @@ endforeach
 
 # Git revision generation
 cuds_sources += vcs_tag(
-    command : ['git', 'rev-parse', 'HEAD'],
-    input : 'version/revision.c.in',
-    output : 'cuds_revision.c',
+    command: ['git', 'rev-parse', 'HEAD'],
+    input: 'version/revision.c.in',
+    output: 'cuds_revision.c',
 )
