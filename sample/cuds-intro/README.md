@@ -60,6 +60,13 @@ meson setup <build_debug_dir> --buildtype=debug
 meson setup <build_debug_dir> --buildtype=debugoptimized
 ```
 
+**Notes** :
+- If you are using MSYS2 on Windows, please define the `prefix` option to the path of your MSYS2 environment :
+```shell
+meson setup <build_dir> --prefix=C:/msys64/ucrt64
+```
+- It allow standard behavior for searching installed libraries on MSYS2.
+
 ---
 
 
@@ -68,6 +75,9 @@ meson setup <build_debug_dir> --buildtype=debugoptimized
 Compile the project :
 ```shell
 meson compile -C <build_dir>
+
+# With verbose output
+meson compile -C <build_dir> --verbose
 ```
 
 ---
@@ -82,14 +92,15 @@ meson devenv -C <build_dir>
 
 # Run the executable
 ./cuds-intro
-```
 
-When finished, exit the devenv :
-```shell
+# Then exit the devenv
 exit
 ```
 
-Or simply run the executable from the build directory.
+Or simply run the executable from the build directory :
+```shell
+./build/cuds-intro
+```
 
 ---
 

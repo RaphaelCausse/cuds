@@ -100,51 +100,53 @@ meson setup <build_debug_dir> --buildtype=debug
 meson setup <build_debug_dir> --buildtype=debugoptimized
 ```
 
+You can configure the installation path at setup (see Notes in [Install](#install)).
+
 ---
 
 
 ## Build
 
-Compile the project, by specifying the build directory :
+Compile the project :
 ```shell
 meson compile -C <build_dir>
+
+# With verbose output
+meson compile -C <build_dir> --verbose
 ```
 
-By default, this builds both the static and the shared library (depending on `default_library` option in `meson.build`).
+**Notes** :
+- By default, this builds both the static and the shared library (depending on `default_library` option).
 
 ---
 
 
 ## Install
 
-Install the library and public headers using default installation prefix path (see **Notes** below):
+Installation is handled by Meson with pkg-config.
+
+Install the library and public headers using default installation path (see **Notes**) :
 ```shell
 meson install -C <build_dir>
 ```
 
-You can customize the installation path :
+You can configure the installation path at setup with the `prefix` option (see **Notes**).
+
+You can override the installation path with `destdir` option (will override the `prefix` option) :
 ```shell
-# Using destination directory
 meson install -C <build_dir> --destdir=<path/to/install>
-
-# or with environment variable
-DESTDIR=<path/to/install> meson install -C <build_dir>
-
-# or with installation prefix path at setup
-meson setup <build_dir> --prefix=<path/to/install>
-meson compile -C <build_dir>
-meson install -C <build_dir>
 ```
-
-This installs :
-* Libraries :
-    - `<destdir|prefix>/lib/libcuds.a` (static)
-    - `<destdir|prefix>/lib/libcuds.so` (shared)
-* Public headers :
-    - `<destdir|prefix>/include/cuds/*.h`
 
 **Notes** :
 - Installation prefix path set with option `prefix` defaults to `C:\` on Windows and `/usr/local` otherwise.
+- If you are using MSYS2 on Windows, define the `prefix` or `destdir` option to the path of your MSYS2 environment, for pkg-config compatibility :
+    ```shell
+     # Configure installation path for MSYS2 at setup  
+     meson setup <build_dir> --prefix=C:/msys64/ucrt64
+
+     # Configure installation path for MSYS2 at install 
+     meson install -C <build_dir> --destdir=C:/msys64/ucrt64
+    ```
 
 ---
 
