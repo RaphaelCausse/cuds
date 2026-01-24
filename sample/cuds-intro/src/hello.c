@@ -4,5 +4,7 @@
 
 void hello(void)
 {
-    printf("Welcome to CUDS %d.%d.%d !\n", CUDS_VERSION_MAJOR, CUDS_VERSION_MINOR, CUDS_VERSION_PATCH);
+    printf("Welcome to CUDS %s !\n", CUDS_VERSION_STRING);
+    printf("Version  : %d\n", cuds_version());
+    printf("Revision : %s\n", CUDS_REVISION);
 }

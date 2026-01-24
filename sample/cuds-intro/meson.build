@@ -40,17 +40,9 @@ source_files = files(
 )
 
 # --------------------------------------------------
-# Includes and libraries
+# Dependencies
 # --------------------------------------------------
-cuds_install_path = get_option('cuds_install_path')
-cuds_inc_dir = include_directories(join_paths(cuds_install_path, 'include'))
-cuds_lib_dir = join_paths(cuds_install_path, 'lib')
-
-cuds_lib = cc.find_library(
-    'cuds',
-    dirs : cuds_lib_dir,
-    required : true
-)
+cuds_lib = dependency('cuds', required : true)
 
 # --------------------------------------------------
 # Executable
@@ -58,7 +50,6 @@ cuds_lib = cc.find_library(
 executable(
     meson.project_name(),
     source_files,
-    include_directories : cuds_inc_dir,
     dependencies : cuds_lib,
     install : false
 )

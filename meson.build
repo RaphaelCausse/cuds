@@ -54,3 +54,16 @@ cuds_lib = library(
 # Tests
 # --------------------------------------------------
 subdir('tests')
+
+# --------------------------------------------------
+# Pkgconfig
+# --------------------------------------------------
+pkg = import('pkgconfig')
+
+pkg.generate(
+  libraries : cuds_lib,
+  version : meson.project_version(),
+  name : meson.project_name(),
+  description : 'C Utilities and Data Structures library',
+  subdirs : meson.project_name()
+)
