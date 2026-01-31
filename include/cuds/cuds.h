@@ -11,6 +11,7 @@
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "version.h"
+#include "cuds/types.h"
+#include "cuds/version.h"
 
 #endif /* CUDS_H */

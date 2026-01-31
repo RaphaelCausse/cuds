@@ -1,7 +1,7 @@
 /******************************************************************************
  * \file version.h
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Public header for CUDS library version module.
+ * \brief Public header for CUDS library version.
  *****************************************************************************/
 
 #ifndef CUDS_VERSION_H
@@ -30,14 +30,14 @@
 /**
  * \brief The current patch version of CUDS headers.
  */
-#define CUDS_VERSION_PATCH 0
+#define CUDS_VERSION_PATCH 1
 
 //-----------------------------------------------------------------------------
 // Numeric version helpers
 //-----------------------------------------------------------------------------
 
 /**
- * \brief Pack version components into a 32-bit numeric value.
+ * \brief Pack version components into a 32-bit unsigned integer.
  */
 #define CUDS_VERSIONNUM(major, minor, patch) \
     (((uint32_t)(major) << 16) |             \
@@ -48,19 +48,19 @@
  * \brief Extract the major version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MAJOR(version) \
-    (((version) >> 16) & 0xFF)
+    ((uint8_t)(((version) >> 16) & 0xFF))
 
 /**
  * \brief Extract the minor version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MINOR(version) \
-    (((version) >> 8) & 0xFF)
+    ((uint8_t)(((version) >> 8) & 0xFF))
 
 /**
  * \brief Extract the patch version from a numeric version.
  */
 #define CUDS_VERSIONNUM_PATCH(version) \
-    ((version) & 0xFF)
+    ((uint8_t)((version) & 0xFF))
 
 //-----------------------------------------------------------------------------
 // String version helpers
@@ -110,12 +110,12 @@ extern const char *CUDS_REVISION;
 
 /**
  * \brief Get the version of CUDS that is linked against your program.
- * \return Numeric version of CUDS.
+ * \return Numeric version of CUDS as 32-bit integer.
  * \note If you are linking to CUDS dynamically, then it is possible that the current
  * version will be different than the version you compiled against. This
  * function returns the current version, while CUDS_VERSION is the version you
  * compiled with.
  */
-extern int cuds_version(void);
+extern uint32_t cuds_version(void);
 
 #endif /* CUDS_VERSION_H */

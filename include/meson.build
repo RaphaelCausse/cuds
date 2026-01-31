@@ -1,5 +1,6 @@
 cuds_headers = files(
     'cuds/cuds.h',
+    'cuds/types.h',
     'cuds/value.h',
     'cuds/version.h',
 )
