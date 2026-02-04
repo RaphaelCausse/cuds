@@ -2,8 +2,6 @@
 
 CUDS is a C library providing generic data structures, common utilities, and helper modules.
 
-It uses Meson as its build system.
-
 ---
 
 
@@ -28,19 +26,18 @@ It uses Meson as its build system.
 ```
 cuds/
 ├── include/        # Public headers
-│ ├── meson.build
-│ └── cuds/
-│ ├── *.h
-│ └── ...
-│
+│   └── cuds/
+│       ├── *.h
+│       └── ...
 ├── src/            # CUDS module sources
-│ ├── meson.build
-│ ├── module1/
-│ │ ├── *.c
-│ │ └── *.h
-│ └── ...
-│
-├── meson.build     # Top-level Meson file
+│   ├── module1/
+│   │   ├── *.c
+│   │   └── *.h
+│   └── ...
+├── tests/          # Unit tests
+│   ├── *.c
+│   └── ...
+├── CMakeLists.txt  # Top-level CMake configuration
 └── README.md
 ```
 
@@ -50,22 +47,7 @@ cuds/
 ## Requirements
 
 - C99-compatible compiler (GCC, Clang, or MSVC)
-- Python (>= 3.8)
-- Meson (>= 0.60.0)
-- Ninja
-
-### Installation of Meson and Ninja (via Python)
-
-Meson and Ninja can be installed using Python and pip, which is the recommended and most portable method.
-```shell
-python --version
-pip --version
-
-pip install meson ninja
-
-meson --version
-ninja --version
-```
+- CMake >= 3.16
 
 ---
 
@@ -84,23 +66,28 @@ Each module:
 
 ## Configuration
 
-Configure the build, at the root of the project :
+Configure the project with CMake :
 ```shell
-meson setup <build_dir>
+cmake -S . -B build
 ```
 
-You can configure multiple build directories, depending on the build type :
+You can specify build type explicitly (default is Release) :
 ```shell
-# Defaut build type is release
-meson setup <build_dir>
+# Release build
+cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
 
-# Build in debug, in a separate build directory
-meson setup <build_debug_dir> --buildtype=debug
-# or
-meson setup <build_debug_dir> --buildtype=debugoptimized
+# Debug build
+cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug
+
+# Release build with debug info
+cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=RelWithDebInfo
 ```
 
-You can configure the installation path at setup (see Notes in [Install](#install)).
+You can also set installation paths :
+```shell
+# Custom installation prefix
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr/local
+```
 
 ---
 
@@ -109,53 +96,47 @@ You can configure the installation path at setup (see Notes in [Install](#instal
 
 Compile the project :
 ```shell
-meson compile -C <build_dir>
-
-# With verbose output
-meson compile -C <build_dir> --verbose
+cmake --build build
 ```
 
-**Notes** :
-- By default, this builds both the static and the shared library (depending on `default_library` option).
+**Notes:**
+
+- Both static and shared libraries are built if enabled via `CUDS_BUILD_SHARED` and `CUDS_BUILD_STATIC`.
+- To enable or disable building shared/static libraries, pass options at configure time :
+    ```shell
+    cmake -S . -B build -DCUDS_BUILD_SHARED=ON -DCUDS_BUILD_STATIC=OFF  
+    ```
 
 ---
 
 
 ## Install
 
-Installation is handled by Meson with pkg-config.
-
-Install the library and public headers using default installation path (see **Notes**) :
+Install the library and headers :
 ```shell
-meson install -C <build_dir>
+cmake --install build
 ```
 
-You can configure the installation path at setup with the `prefix` option (see **Notes**).
+You can specify an installation prefix explicitly :
 ```shell
-meson setup <build_dir> --prefix=<path/to/install>
-
-# If project already setup, you might need to reconfigure it
-meson setup <build_dir> --prefix=<path/to/install> --reconfigure
-
-# Then compile, and install
-meson compile -C <build_dir>
-meson install -C <build_dir>
+cmake --install build --prefix /usr/local
 ```
 
-You can override the installation path with `destdir` option (will override the `prefix` option) :
-```shell
-meson install -C <build_dir> --destdir=<path/to/install>
-```
+This will install :
 
-**Notes** :
-- Installation prefix path set with option `prefix` defaults to `C:\` on Windows and `/usr/local` otherwise.
-- If you are using MSYS2 on Windows, define the `prefix` or `destdir` option to the path of your MSYS2 environment, for pkg-config compatibility :
+- Public headers to `<prefix>/include/cuds`
+- Libraries to `<prefix>/lib`
+- CMake Package config files to `<prefix>/lib/cmake/cuds`
+- Pkg-config files to `<prefix>/lib/pkgconfig`
+
+**Notes:**
+
+- The library supports pkg-config. A .pc file is installed in the correct `lib/pkgconfig/` folder.
+- For MSYS2 environments, set the prefix to the MSYS2 path for compatibility with pkg-config :
     ```shell
-     # Configure installation path for MSYS2 at setup  
-     meson setup <build_dir> --prefix=C:/msys64/ucrt64
-
-     # Configure installation path for MSYS2 at install 
-     meson install -C <build_dir> --destdir=C:/msys64/ucrt64
+    cmake -S . -B build -DCMAKE_INSTALL_PREFIX=C:/msys64/ucrt64
+    cmake --build build
+    cmake --install build
     ```
 
 ---
@@ -163,33 +144,44 @@ meson install -C <build_dir> --destdir=<path/to/install>
 
 ## Usage
 
-### Sample projects using Meson
+To use CUDS in another CMake project :
+```cmake
+# Find the installed CUDS library
+find_package(cuds REQUIRED)
+
+# Link against the shared or static library explicitly
+target_link_libraries(my_target PRIVATE cuds::cuds_shared)  # for shared library
+# target_link_libraries(my_target PRIVATE cuds::cuds_static) # for static library
+```
+
+Include the public headers in your source files :
+```c
+#include <cuds/cuds.h>
+#include <cuds/value.h>
+```
 
 Example projects demonstrating how to use CUDS are available in the [sample/](sample/) directory.
-
-These samples show how to :
-- Configure projects using Meson
-- Include CUDS public headers
-- Link against the CUDS static or shared library
 
 ---
 
 
 ## Tests
 
-Build and run a single test :
-```shell
-meson test -C <build_dir> <test_name>
-```
-
 Build and run all tests :
 ```shell
-meson test -C <build_dir>
+cmake --build build --target all
+ctest --output-on-failure
 ```
 
-**Notes** :
-- All tests are compiled with the current build type.
-- The stdout of passing tests is normally hidden; to see it, use `--verbose` or run the executable directly
+Build and run a specific test executable :
+```shell
+ctest -R test_version --output-on-failure
+```
+
+**Notes:**
+
+- Tests are built according to the current build type.
+- Option `--output-on-failure` prints stdout/stderr of failing tests.
 
 ---
 
@@ -198,15 +190,14 @@ meson test -C <build_dir>
 
 Remove build artifacts :
 ```shell
-meson compile -C <build_dir> --clean
+cmake --build build --target clean
+
+# or
+
+rm -rf build
 ```
 
-To completely reset the build directory, delete it and then reconfigure the build (see [build](#build)) :
-```shell
-rm -rf <build_dir>
-
-meson setup <build_dir>
-```
+Don't forget to reconfigure after cleaning.
 
 ---
 
