@@ -26,12 +26,12 @@
 /**
  * \brief The current minor version of CUDS headers.
  */
-#define CUDS_VERSION_MINOR 0
+#define CUDS_VERSION_MINOR 1
 
 /**
  * \brief The current patch version of CUDS headers.
  */
-#define CUDS_VERSION_PATCH 1
+#define CUDS_VERSION_PATCH 0
 
 //-----------------------------------------------------------------------------
 // Numeric version helpers
