@@ -1,7 +1,6 @@
 # =========================
 # Build artifacts
 # =========================
-/build/
 *.o
 *.obj
 *.d
@@ -12,6 +11,7 @@
 *.exe
 *.out
 *.app
+**/build/
 **/CMakeFiles/
 **/CMakeCache.txt
 **/Testing/

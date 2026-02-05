@@ -56,7 +56,7 @@ if(CUDS_BUILD_SHARED)
     )
 
     set_target_properties(cuds_shared PROPERTIES
-        OUTPUT_NAME cuds
+        OUTPUT_NAME ${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
     )
@@ -72,7 +72,7 @@ if(CUDS_BUILD_STATIC)
     )
 
     set_target_properties(cuds_static PROPERTIES
-        OUTPUT_NAME cuds
+        OUTPUT_NAME ${PROJECT_NAME}
     )
 endif()
 
@@ -104,8 +104,8 @@ endforeach()
 
 # Export the targets
 install(
-    EXPORT cudsTargets
-    FILE cudsTargets.cmake
-    NAMESPACE cuds::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cuds
+    EXPORT ${PROJECT_NAME}Targets
+    FILE ${PROJECT_NAME}Targets.cmake
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )

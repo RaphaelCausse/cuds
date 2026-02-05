@@ -52,22 +52,22 @@ endif()
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/cudsConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
 configure_package_config_file(
-    ${CMAKE_SOURCE_DIR}/cmake/cudsConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cudsConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cuds
+    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/cudsConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/cudsConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cuds
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
 # --------------------------------------------------
@@ -75,12 +75,12 @@ install(
 # --------------------------------------------------
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/cuds.pc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/cuds.pc
+    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     @ONLY
 )
 
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/cuds.pc
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
