@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 
 #include <stdint.h>
+#include "cuds/export.h"
 
 //-----------------------------------------------------------------------------
 // Version components
@@ -102,7 +103,7 @@
  * identifies the source revision used to produce the binary (for example
  * a Git commit hash).
  */
-extern const char *CUDS_REVISION;
+CUDS_API extern const char *CUDS_REVISION;
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -116,6 +117,6 @@ extern const char *CUDS_REVISION;
  * function returns the current version, while CUDS_VERSION is the version you
  * compiled with.
  */
-extern uint32_t cuds_version(void);
+CUDS_API uint32_t cuds_version(void);
 
 #endif /* CUDS_VERSION_H */

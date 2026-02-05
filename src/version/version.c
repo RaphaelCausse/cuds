@@ -14,7 +14,7 @@
 // Functions
 //-----------------------------------------------------------------------------
 
-uint32_t cuds_version(void)
+CUDS_API uint32_t cuds_version(void)
 {
     return (uint32_t)CUDS_VERSION;
 }
