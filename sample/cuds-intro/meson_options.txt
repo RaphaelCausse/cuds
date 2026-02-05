@@ -1,5 +1,0 @@
-option(
-    'cuds_install_path',
-    type : 'string',
-    description : 'CUDS library installation prefix path'
-)
