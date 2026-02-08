@@ -3,6 +3,7 @@
 # --------------------------------------------------
 
 set(CUDS_MODULES
+    string
     value
     version
 )
@@ -52,7 +53,7 @@ if(CUDS_BUILD_SHARED)
     target_compile_definitions(cuds_shared
         PRIVATE
             CUDS_SHARED
-            CUDS_BUILD
+            CUDS_SHARED_EXPORT
     )
 
     set_target_properties(cuds_shared PROPERTIES

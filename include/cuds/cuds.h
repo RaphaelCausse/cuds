@@ -11,6 +11,7 @@
 // Includes
 //-----------------------------------------------------------------------------
 
+#include "cuds/string.h"
 #include "cuds/types.h"
 #include "cuds/version.h"
 

@@ -5,6 +5,7 @@
 set(CUDS_PUBLIC_HEADERS
     cuds/cuds.h
     cuds/export.h
+    cuds/string.h
     cuds/value.h
     cuds/version.h
 )
