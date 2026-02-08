@@ -9,11 +9,11 @@
 
 #if defined(_WIN32)
   #if defined(CUDS_SHARED)
-    #if defined(CUDS_BUILD)
+    #if defined(CUDS_SHARED_EXPORT)
       #define CUDS_API __declspec(dllexport)
-    #else /* CUDS_BUILD */
+    #else /* CUDS_SHARED_EXPORT */
       #define CUDS_API __declspec(dllimport)
-    #endif /* CUDS_BUILD */
+    #endif /* CUDS_SHARED_EXPORT */
   #else  /* CUDS_SHARED */
     #define CUDS_API
   #endif /* CUDS_SHARED */

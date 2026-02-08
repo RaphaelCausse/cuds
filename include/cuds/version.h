@@ -11,27 +11,32 @@
 // Includes
 //-----------------------------------------------------------------------------
 
-#include <stdint.h>
 #include "cuds/export.h"
+#include "cuds/types.h"
 
 //-----------------------------------------------------------------------------
 // Version components
 //-----------------------------------------------------------------------------
 
 /**
- * \brief The current major version of CUDS headers.
+ * \brief The current major version of CUDS library.
  */
 #define CUDS_VERSION_MAJOR 0
 
 /**
- * \brief The current minor version of CUDS headers.
+ * \brief The current minor version of CUDS library.
  */
 #define CUDS_VERSION_MINOR 1
 
 /**
- * \brief The current patch version of CUDS headers.
+ * \brief The current patch version of CUDS library.
  */
 #define CUDS_VERSION_PATCH 0
+
+/**
+ * \brief The current suffix of CUDS version.
+ */
+#define CUDS_VERSION_SUFFIX ""
 
 //-----------------------------------------------------------------------------
 // Numeric version helpers
@@ -75,7 +80,7 @@
 //-----------------------------------------------------------------------------
 
 /**
- * \brief Numeric version of the current CUDS headers.
+ * \brief Numeric version of the current CUDS library.
  */
 #define CUDS_VERSION                    \
     CUDS_VERSIONNUM(CUDS_VERSION_MAJOR, \
@@ -83,12 +88,12 @@
                     CUDS_VERSION_PATCH)
 
 /**
- * \brief Human-readable version string of the CUDS headers.
+ * \brief Human-readable version string of the CUDS library.
  *
  * The format is "MAJOR.MINOR.PATCH".
  */
 #define CUDS_VERSION_STRING \
-    (CUDS_STRINGIFY(CUDS_VERSION_MAJOR) "." CUDS_STRINGIFY(CUDS_VERSION_MINOR) "." CUDS_STRINGIFY(CUDS_VERSION_PATCH))
+    (CUDS_STRINGIFY(CUDS_VERSION_MAJOR) "." CUDS_STRINGIFY(CUDS_VERSION_MINOR) "." CUDS_STRINGIFY(CUDS_VERSION_PATCH) CUDS_VERSION_SUFFIX)
 
 /**
  * \brief Evaluate to true if CUDS is at least of version X.Y.Z.
@@ -100,13 +105,12 @@
  * \brief Source control revision string of the CUDS library.
  *
  * This string is embedded into the compiled library at build time and
- * identifies the source revision used to produce the binary (for example
- * a Git commit hash).
+ * identifies the source revision used to produce the binary.
  */
-CUDS_API extern const char *CUDS_REVISION;
+extern CUDS_API const char *CUDS_REVISION;
 
 //-----------------------------------------------------------------------------
-// Functions
+// Functions declarations
 //-----------------------------------------------------------------------------
 
 /**

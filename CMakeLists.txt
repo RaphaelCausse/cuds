@@ -12,6 +12,14 @@ project(
 )
 
 # --------------------------------------------------
+# Options
+# --------------------------------------------------
+
+option(CUDS_BUILD_SHARED "Build shared library" ON)
+option(CUDS_BUILD_STATIC "Build static library" ON)
+option(CUDS_BUILD_TESTS  "Build tests"          ON)
+
+# --------------------------------------------------
 # Standard & build type
 # --------------------------------------------------
 
@@ -25,13 +33,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
 endif()
 
-# --------------------------------------------------
-# Options
-# --------------------------------------------------
-
-option(CUDS_BUILD_SHARED "Build shared library" ON)
-option(CUDS_BUILD_STATIC "Build static library" ON)
-option(CUDS_BUILD_TESTS  "Build tests"          ON)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(DEBUG)
+endif()
 
 # --------------------------------------------------
 # Subdirectories
