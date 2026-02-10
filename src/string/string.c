@@ -8,8 +8,6 @@
 // Includes
 //-----------------------------------------------------------------------------
 
-#include <stdlib.h>
-#include <string.h>
 #include "cuds/string.h"
 #include "string_internal.h"
 
@@ -29,17 +27,25 @@ CUDS_API void cuds_string_free(cuds_string_t self)
     {
         return;
     }
-    free(ICUDS_STRING_HEADER(self));
+    ICUDS_FREE(ICUDS_STRING_HEADER(self));
 }
 
 CUDS_API void cuds_string_destroy(cuds_string_t *p_self)
 {
+    if (p_self == NULL || *p_self == NULL)
+    {
+        return;
+    }
     cuds_string_free(*p_self);
     *p_self = NULL;
 }
 
 CUDS_API size_t cuds_string_len(cuds_string_t self)
 {
+    if (self == NULL)
+    {
+        return (size_t)0;
+    }
     icuds_string_header_t *p_string_header = ICUDS_STRING_HEADER(self);
     return p_string_header->length;
 }
