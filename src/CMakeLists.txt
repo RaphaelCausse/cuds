@@ -16,6 +16,14 @@ foreach(module IN LISTS CUDS_MODULES)
 endforeach()
 
 # --------------------------------------------------
+# Compiler options
+# --------------------------------------------------
+
+set(CUDS_C_FLAGS
+    -Wall -Wextra -pedantic -funsigned-char
+)
+
+# --------------------------------------------------
 # Git revision generation
 # --------------------------------------------------
 
@@ -83,6 +91,8 @@ endif()
 
 foreach(target cuds_shared cuds_static)
     if(TARGET ${target})
+        target_compile_options(${target} PRIVATE ${CUDS_C_FLAGS})
+
         target_include_directories(${target}
             PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>

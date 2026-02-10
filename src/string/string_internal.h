@@ -11,9 +11,7 @@
 // Includes
 //-----------------------------------------------------------------------------
 
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include "cuds/string.h"
 #include "cuds_internal.h"
 
 //-----------------------------------------------------------------------------
