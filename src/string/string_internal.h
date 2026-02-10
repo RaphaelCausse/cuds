@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "cuds_internal.h"
 
 //-----------------------------------------------------------------------------
 // Types definitions
@@ -33,21 +34,6 @@ typedef struct
 //-----------------------------------------------------------------------------
 // Macros definitions
 //-----------------------------------------------------------------------------
-
-/**
- * \brief Allocate memory.
- * \param[in] size Number of bytes to allocate.
- * \return Pointer to allocated memory on success, or `NULL` on failure.
- */
-#define ICUDS_ALLOC(size) \
-    (malloc((size_t)size))
-
-/**
- * \brief Free memory.
- * \param[in,out] ptr Pointer to memory to free.
- */
-#define ICUDS_FREE(ptr) \
-    (free((void *)ptr))
 
 /**
  * \brief Retrieve the internal header pointer from a CUDS dynamic string.
