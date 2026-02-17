@@ -1,0 +1,106 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "cacheVariables": {
+                "CUDS_BUILD_SHARED": "ON",
+                "CUDS_BUILD_STATIC": "ON",
+                "CUDS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "linux-gcc-debug",
+            "inherits": "base",
+            "generator": "Unix Makefiles",
+            "binaryDir": "build/linux-gcc-debug",
+            "toolchainFile": "cmake/toolchains/linux-gcc.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "linux-gcc-release",
+            "inherits": "base",
+            "generator": "Unix Makefiles",
+            "binaryDir": "build/linux-gcc-release",
+            "toolchainFile": "cmake/toolchains/linux-gcc.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "windows-ucrt64-gcc-debug",
+            "inherits": "base",
+            "generator": "Ninja",
+            "binaryDir": "build/windows-ucrt64-gcc-debug",
+            "toolchainFile": "cmake/toolchains/windows-ucrt64-gcc.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "C:/msys64/ucrt64"
+            }
+        },
+        {
+            "name": "windows-ucrt64-gcc-release",
+            "inherits": "base",
+            "generator": "Ninja",
+            "binaryDir": "build/windows-ucrt64-gcc-release",
+            "toolchainFile": "cmake/toolchains/windows-ucrt64-gcc.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INSTALL_PREFIX": "C:/msys64/ucrt64"
+            }
+        }
+    ],
+
+    "buildPresets": [
+        {
+            "name": "linux-gcc-debug",
+            "configurePreset": "linux-gcc-debug"
+        },
+        {
+            "name": "linux-gcc-release",
+            "configurePreset": "linux-gcc-release"
+        },
+        {
+            "name": "windows-ucrt64-gcc-debug",
+            "configurePreset": "windows-ucrt64-gcc-debug"
+        },
+        {
+            "name": "windows-ucrt64-gcc-release",
+            "configurePreset": "windows-ucrt64-gcc-release"
+        }
+    ],
+
+    "testPresets": [
+        {
+            "name": "linux-gcc-debug",
+            "configurePreset": "linux-gcc-debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "linux-gcc-release",
+            "configurePreset": "linux-gcc-release",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "windows-ucrt64-gcc-debug",
+            "configurePreset": "windows-ucrt64-gcc-debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "windows-ucrt64-gcc-release",
+            "configurePreset": "windows-ucrt64-gcc-release",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}

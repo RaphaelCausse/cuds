@@ -1,0 +1,43 @@
+# =========================
+# Build artifacts
+# =========================
+*.o
+*.obj
+*.d
+*.a
+*.so
+*.lib
+*.dll
+*.exe
+*.out
+*.app
+**/build/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/Testing/
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+*.code-workspace
+*.swp
+*.swo
+*.idea/
+*.user
+*.sln
+*.vcxproj*
+*.DS_Store
+
+# =========================
+# OS generated
+# =========================
+Thumbs.db
+Desktop.ini
+
+# =========================
+# Logs, temporary files
+# =========================
+*.log
+*.tmp
+*.bak
