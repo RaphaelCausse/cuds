@@ -1,11 +1,11 @@
 /******************************************************************************
- * \file types.h
+ * \file cuds_types.h
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
  * \brief Public header for CUDS library standard types.
  *****************************************************************************/
 
-#ifndef CUDS_TYPES_H
-#define CUDS_TYPES_H
+#ifndef _CUDS_TYPES_H
+#define _CUDS_TYPES_H
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -13,29 +13,16 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
-//-----------------------------------------------------------------------------
-// Macros
-//-----------------------------------------------------------------------------
-
-/**
- * \brief True boolean value.
- */
-#define CUDS_TRUE (1)
-
-/**
- * \brief False boolean value.
- */
-#define CUDS_FALSE (0)
+#include <stdbool.h>
 
 //-----------------------------------------------------------------------------
 // Types
 //-----------------------------------------------------------------------------
 
 /**
- * \brief Boolean, 8-bit.
+ * \brief Byte, 8-bit.
  */
-typedef uint8_t bool8_t;
+typedef uint8_t byte_t;
 
 /**
  * \brief Boolean, 32-bit.
@@ -52,4 +39,4 @@ typedef float float32_t;
  */
 typedef double float64_t;
 
-#endif /* CUDS_TYPES_H */
+#endif /* _CUDS_TYPES_H */

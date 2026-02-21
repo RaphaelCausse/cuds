@@ -6,6 +6,7 @@ set(CUDS_SOURCES
     # Main sources
     cuds.c
     # Modules sources
+    platform/platform.c
     version/version.c
 )
 
@@ -60,6 +61,8 @@ if(CUDS_BUILD_SHARED)
     )
 
     set_target_properties(cuds_shared PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+        C_VISIBILITY_PRESET hidden
         OUTPUT_NAME ${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
@@ -80,6 +83,7 @@ if(CUDS_BUILD_STATIC)
     )
 
     set_target_properties(cuds_static PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
         OUTPUT_NAME ${PROJECT_NAME}
     )
 endif()

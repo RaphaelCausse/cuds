@@ -3,6 +3,7 @@
 # --------------------------------------------------
 
 set(CUDS_TESTS
+    test_cuds
     test_version
 )
 

@@ -4,26 +4,16 @@
  * \brief Main public header for CUDS library.
  *****************************************************************************/
 
-#ifndef CUDS_H
-#define CUDS_H
-
-//-----------------------------------------------------------------------------
-// Check minimum C standard
-//-----------------------------------------------------------------------------
-
-#if !defined(__STDC_VERSION__) || (__STDC_VERSION__ < 199901L)
-  #error "CUDS requires at least C99 standard"
-#endif
+#ifndef _CUDS_H
+#define _CUDS_H
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "cuds/version.h"
-#include "cuds/platform.h"
-#include "cuds/types.h"
+#include "cuds/cuds_common.h"
+#include "cuds/cuds_platform.h"
+#include "cuds/cuds_units.h"
+#include "cuds/cuds_version.h"
 
-#include "cuds/algorithm.h"
-#include "cuds/units.h"
-
-#endif /* CUDS_H */
+#endif /* _CUDS_H */

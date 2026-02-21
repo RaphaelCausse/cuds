@@ -1,20 +1,22 @@
 /******************************************************************************
- * \file algorithms.h
+ * \file cuds_common.h
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Public header for CUDS library algorithm helpers.
+ * \brief Public header for CUDS library common includes.
  *****************************************************************************/
 
-#ifndef CUDS_ALGORITHM_H
-#define CUDS_ALGORITHM_H
+#ifndef _CUDS_COMMON_H
+#define _CUDS_COMMON_H
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "cuds/types.h"
+#include <stdlib.h>
+#include "cuds/cuds_api.h"
+#include "cuds/cuds_types.h"
 
 //-----------------------------------------------------------------------------
-// Functions
+// Macros
 //-----------------------------------------------------------------------------
 
 /**
@@ -23,10 +25,7 @@
  * \param[in] b Second value to compare.
  * \return The minimum of `a` and `b`.
  */
-static inline size_t cuds_min(size_t a, size_t b)
-{
-    return (a < b) ? a : b;
-}
+#define cuds_min(x, y) (((x) < (y)) ? (x) : (y))
 
 /**
  * \brief Get the maximum of two values.
@@ -34,9 +33,6 @@ static inline size_t cuds_min(size_t a, size_t b)
  * \param[in] b Second value to compare.
  * \return The maximum of `a` and `b`.
  */
-static inline size_t cuds_max(size_t a, size_t b)
-{
-    return (a > b) ? a : b;
-}
+#define cuds_max(x, y) (((x) > (y)) ? (x) : (y))
 
-#endif /* CUDS_ALGORITHM_H */
+#endif /* _CUDS_COMMON_H */

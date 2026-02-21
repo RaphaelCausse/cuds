@@ -1,26 +1,27 @@
 /******************************************************************************
- * \file revision.c
+ * \file cuds_platform.h
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Build-time source revision information for CUDS library.
+ * \brief Public header for CUDS library platform dectection.
  *****************************************************************************/
+
+#ifndef _CUDS_PLATFORM_H
+#define _CUDS_PLATFORM_H
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "cuds/cuds_version.h"
- 
-//-----------------------------------------------------------------------------
-// Internals
-//-----------------------------------------------------------------------------
-
-static const char *CUDS_REVISION_STR = "@CUDS_GIT_REVISION@";
+#include "cuds/cuds_common.h"
+#include "cuds/cuds_platform_defines.h"
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
 
-const char *cuds_revision(void)
-{
-    return CUDS_REVISION_STR;
-}
+/**
+ * \brief Get the name of the platform.
+ * \return Return the name of the platform if supported, otherwise "Unknown".
+ */
+extern CUDS_API const char *cuds_platform(void);
+
+#endif /* _CUDS_PLATFORM_H */

@@ -8,13 +8,13 @@
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "cuds/version.h"
+#include "cuds/cuds_version.h"
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
 
-CUDS_API uint32_t cuds_version(void)
+uint32_t cuds_version(void)
 {
     return (uint32_t)CUDS_VERSION;
 }

@@ -1,26 +1,28 @@
 /******************************************************************************
- * \file revision.c
+ * \file platform.c
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Build-time source revision information for CUDS library.
+ * \brief Implementation for CUDS library platform.
  *****************************************************************************/
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include "cuds/cuds_version.h"
- 
-//-----------------------------------------------------------------------------
-// Internals
-//-----------------------------------------------------------------------------
-
-static const char *CUDS_REVISION_STR = "@CUDS_GIT_REVISION@";
+#include "cuds/cuds_platform.h"
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
 
-const char *cuds_revision(void)
+const char *cuds_platform(void)
 {
-    return CUDS_REVISION_STR;
+#if defined(CUDS_PLATFORM_WINDOWS)
+    return "Windows";
+#elif defined(CUDS_PLATFORM_LINUX)
+    return "Linux";
+#elif defined(CUDS_PLATFORM_APPLE)
+    return "Apple";
+#else
+    return "Unknown";
+#endif
 }

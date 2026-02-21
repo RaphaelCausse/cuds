@@ -1,18 +1,17 @@
 /******************************************************************************
- * \file version.h
+ * \file cuds_version.h
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
  * \brief Public header for CUDS library version.
  *****************************************************************************/
 
-#ifndef CUDS_VERSION_H
-#define CUDS_VERSION_H
+#ifndef _CUDS_VERSION_H
+#define _CUDS_VERSION_H
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include <stdint.h>
-#include "cuds/export.h"
+#include "cuds/cuds_common.h"
 
 //-----------------------------------------------------------------------------
 // Version
@@ -69,7 +68,7 @@
     ((uint8_t)((version) & 0xFF))
 
 /**
- * \brief Converts a token into a string literal (helper macro, do not use directly).
+ * \brief Converts a token into a string literal (helper macro, do not use directly, use CUDS_STRINGIFY).
  */
 #define CUDS_STRINGIFY_HELPER(x) #x
 
@@ -79,7 +78,7 @@
 #define CUDS_STRINGIFY(x) CUDS_STRINGIFY_HELPER(x)
 
 //-----------------------------------------------------------------------------
-// Current version and revision
+// Current version
 //-----------------------------------------------------------------------------
 
 /**
@@ -101,26 +100,22 @@
 #define CUDS_VERSION_ATLEAST(x, y, z) \
     (CUDS_VERSION >= CUDS_VERSIONNUM((x), (y), (z)))
 
-/**
- * \brief Source control revision string of the CUDS library.
- * This string is embedded into the compiled library at build time and
- * identifies the source revision used to produce the binary.
- */
-// extern CUDS_API const char *CUDS_REVISION;
-extern const char *CUDS_REVISION;
-
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
 
 /**
- * \brief Get the version of CUDS that is linked against your program.
- * \return Numeric version of CUDS as 32-bit integer.
- * \note If you are linking to CUDS dynamically, then it is possible that the current
- * version will be different than the version you compiled against.
- * This * function returns the current version, while CUDS_VERSION is the version you
- * compiled with.
+ * \brief Get the current version of CUDS library that is linked against.
+ * \return Numeric version of CUDS library.
+ * \note If you are linking against the shared library, the version may differ
+ * from the one you compiled against.
  */
-CUDS_API uint32_t cuds_version(void);
+extern CUDS_API uint32_t cuds_version(void);
 
-#endif /* CUDS_VERSION_H */
+/**
+ * \brief Get the current revision string of CUDS library that is linked against.
+ * \return Revision string containing of CUDS library.
+ */
+extern CUDS_API const char *cuds_revision(void);
+
+#endif /* _CUDS_VERSION_H */
