@@ -20,6 +20,7 @@
 /* Symbols visibility */
 
 #if CUDS_PLATFORM_WINDOWS
+
   #if defined(CUDS_SHARED) && defined(CUDS_SHARED_EXPORT)
     /* Building the shared library, exports symbols */
     #define CUDS_API __declspec(dllexport)
@@ -28,17 +29,16 @@
     #define CUDS_API __declspec(dllimport)
   #else
     #define CUDS_API
-  #endif
+  #endif /* CUDS_SHARED */
 
-#elif (CUDS_PLATFORM_UNIX || CUDS_PLATFORM_LINUX || CUDS_PLATFORM_MACOS)
-  #if (CUDS_COMPILER_GCC || CUDS_COMPILER_CLANG)
+#elif (CUDS_PLATFORM_LINUX || CUDS_PLATFORM_MACOS)
+
+  #if defined(CUDS_SHARED)
     #define CUDS_API __attribute__((visibility("default")))
   #else
     #define CUDS_API
-  #endif
+  #endif /* CUDS_SHARED */
 
-#else
-  #define CUDS_API
 #endif /* CUDS_PLATFORM_WINDOWS */
 
 #endif /* CUDS_EXPORT_H */

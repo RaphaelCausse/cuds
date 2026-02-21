@@ -11,7 +11,16 @@
 #include "cuds/version.h"
  
 //-----------------------------------------------------------------------------
-// Globals
+// Internals
 //-----------------------------------------------------------------------------
 
-const char *CUDS_REVISION = "@CUDS_GIT_REVISION@";
+static const char *CUDS_REVISION_STR = "@CUDS_GIT_REVISION@";
+
+//-----------------------------------------------------------------------------
+// Functions
+//-----------------------------------------------------------------------------
+
+const char *cuds_revision(void)
+{
+    return CUDS_REVISION_STR;
+}

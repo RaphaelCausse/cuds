@@ -21,9 +21,9 @@
 
 #include "cuds/version.h"
 #include "cuds/platform.h"
-#include "cuds/types.h"
 
-#include "cuds/algorithm.h"
+#include "cuds/types.h"
 #include "cuds/units.h"
+#include "cuds/algorithm.h"
 
 #endif /* CUDS_H */

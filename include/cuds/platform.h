@@ -31,7 +31,7 @@
   #define CUDS_PLATFORM_MACOS (0)
 #endif /* __APPLE__ */
 
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__) || defined(__linux__) || defined(__APPLE__)
   #define CUDS_PLATFORM_UNIX (1)
 #else
   #define CUDS_PLATFORM_UNIX (0)
