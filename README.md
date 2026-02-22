@@ -31,21 +31,29 @@ CUDS is a C library providing generic data structures, common utilities, and hel
 ## Configuration
 
 List all available configure presets:
-```shell
+```sh
 cmake --list-presets
 ```
 
 Configure the project, using a preset (recommended) :
-```shell
+```sh
 cmake --preset linux-gcc-release
 ```
 
-If you prefer to configure manually :
-```shell
-cmake -S . -B build/release \
+If you prefer to configure manually, in `<BUILD_DIR>` :
+```sh
+cmake -S . -B <BUILD_DIR> \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr/local
+    -DCMAKE_INSTALL_PREFIX=/usr/local \
+    -DCUDS_BUILD_SHARED=ON \
+    -DCUDS_BUILD_STATIC=OFF \
+    -DCUDS_BUILD_TESTS=OFF
 ```
+
+**Notes:**
+
+- Both static and shared libraries are built by default. Enable/Disable by setting options `CUDS_BUILD_SHARED` and `CUDS_BUILD_STATIC` at configuration.
+- Tests are built by default. Enable/Disable by setting option `CUDS_BUILD_TESTS` at configuration.
 
 ---
 
@@ -53,18 +61,19 @@ cmake -S . -B build/release \
 ## Build
 
 List all available build presets:
-```shell
+```sh
 cmake --build --list-presets
 ```
 
 Build the project, using a preset (recommended) :
-```shell
+```sh
 cmake --build --preset linux-gcc-release
 ```
 
-**Notes:**
-
-- Both static and shared libraries are built if enabled via `CUDS_BUILD_SHARED` and `CUDS_BUILD_STATIC` that you can set.
+If you prefer to build manually, in `<BUILD_DIR>` :
+```sh
+cmake --build <BUILD_DIR>
+```
 
 ---
 
@@ -72,18 +81,16 @@ cmake --build --preset linux-gcc-release
 ## Install
 
 Install the library and headers :
-```shell
+```sh
 cmake --install <BUILD_DIR>
-
-# Example : cmake --install build/linux-gcc-release
 ```
 
 You can specify an installation prefix explicitly :
-```shell
+```sh
 cmake --install <BUILD_DIR> --prefix <PREFIX_PATH>
 ```
 
-Files are installed as follows:
+Files are installed as follows :
 * Headers : `<PREFIX_PATH>/include/cuds`
 * Libraries : `<PREFIX_PATH>/lib`
 * CMake package config : `<PREFIX_PATH>/lib/cmake/cuds`
@@ -106,17 +113,16 @@ target_link_libraries(my_target PRIVATE cuds::cuds_shared)
 # target_link_libraries(my_target PRIVATE cuds::cuds_static)
 ```
 
+### Using pkg-config
+
+```sh
+pkg-config --cflags --libs cuds
+```
+
 ### Include headers
 
 ```c
 #include <cuds/cuds.h>
-#include <cuds/arena.h>
-```
-
-### Using pkg-config
-
-```shell
-pkg-config --cflags --libs cuds
 ```
 
 Example projects demonstrating how to use CUDS are available in the [sample/](sample/) directory.
@@ -127,17 +133,17 @@ Example projects demonstrating how to use CUDS are available in the [sample/](sa
 ## Tests
 
 List all available test presets :
-```shell
+```sh
 ctest --list-presets
 ```
 
 Build and run all tests, using a preset :
-```shell
+```sh
 ctest --preset linux-gcc-debug
 ```
 
 Build and run a specific test executable :
-```shell
+```sh
 ctest --preset linux-gcc-debug -R test_version
 ```
 
@@ -147,12 +153,12 @@ ctest --preset linux-gcc-debug -R test_version
 ## Clean
 
 Remove build artifacts :
-```shell
+```sh
 rm -rf build
 ```
 
 Or clean a specific build directory :
-```shell
+```sh
 cmake --build build/linux-gcc-release --target clean
 ```
 
