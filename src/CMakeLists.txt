@@ -10,10 +10,6 @@ set(CUDS_SOURCES
     version/version.c
 )
 
-set(CUDS_INTERNAL_HEADERS
-    # Internal headers
-)
-
 # --------------------------------------------------
 # Git revision generation
 # --------------------------------------------------
