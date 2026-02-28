@@ -12,6 +12,7 @@
 /*****************************************************************************/
 
 #include "cuds/cuds_common.h"
+#include "cuds/cuds_arena.h"
 #include "cuds/cuds_platform.h"
 #include "cuds/cuds_units.h"
 #include "cuds/cuds_version.h"

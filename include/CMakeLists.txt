@@ -8,6 +8,7 @@ set(CUDS_PUBLIC_HEADERS
     # Public headers
     cuds/cuds_align.h
     cuds/cuds_api.h
+    cuds/cuds_arena.h
     cuds/cuds_common.h
     cuds/cuds_platform_defines.h
     cuds/cuds_platform.h
