@@ -1,48 +1,40 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <cuds/cuds.h>
 
-#define ARENA_SIZE (CUDS_KB(1))
-
-typedef struct
-{
-    float64_t x;
-    float64_t y;
-    float64_t z;
-} vec3_t;
+#define ARENA_SIZE ((size_t)4)
 
 int main(void)
 {
     cuds_arena_t *p_arena = cuds_arena_create(ARENA_SIZE);
     if (p_arena == NULL)
     {
-        printf("Failed to created arena of capacity %zu bytes.\n", ARENA_SIZE);
+        printf("Error %d: Failed to created arena of capacity %zu bytes: %s.\n", errno, ARENA_SIZE, strerror(errno));
         return EXIT_FAILURE;
     }
-    printf("Created arena of capacity %zu bytes @0x%p.\n", ARENA_SIZE, (void *)p_arena);
+    printf("Created arena of capacity %zu bytes (@0x%p).\n", ARENA_SIZE, (void *)p_arena);
 
     uint32_t *x1 = cuds_arena_alloc(p_arena, sizeof(uint32_t));
     if (x1 == NULL)
     {
-        printf("Failed to allocated %zu bytes.\n", sizeof(*x1));
+        printf("Error %d: Failed to allocated %zu bytes: %s.\n", errno, sizeof(*x1), strerror(errno));
     }
-    printf("Allocated %zu bytes @0x%p.\n", sizeof(*x1), (void *)x1);
-
-    printf("Remaining %zu bytes in arena.\n", cuds_arena_remaining(p_arena));
-
-    size_t count = 0;
-    while (true)
+    else
     {
-        vec3_t *vec = cuds_arena_alloc(p_arena, sizeof(vec3_t));
-        if (vec == NULL)
-        {
-            printf("Failed to allocated %zu bytes (remaining %zu).\n", sizeof(*vec), cuds_arena_remaining(p_arena));
-            break;
-        }
-        printf("[%zu] Allocated %zu bytes @0x%p.\n", count, sizeof(*vec), (void *)vec);
-        printf("[%zu] Remaining %zu bytes in arena.\n", count, cuds_arena_remaining(p_arena));
+        printf("Allocated %zu bytes (@0x%p).\n", sizeof(*x1), (void *)x1);
+        printf("Remaining %zu bytes in arena.\n", cuds_arena_remaining(p_arena));
+    }
 
-        count++;
+    uint64_t *x2 = cuds_arena_alloc(p_arena, sizeof(*x2));
+    if (x2 == NULL)
+    {
+        printf("Error %d: Failed to allocated %zu bytes: %s.\n", errno, sizeof(*x2), strerror(errno));
+    }
+    else
+    {
+        printf("Allocated %zu bytes (@0x%p).\n", sizeof(*x2), (void *)x2);
+        printf("Remaining %zu bytes in arena.\n", cuds_arena_remaining(p_arena));
     }
 
     p_arena = cuds_arena_destroy(p_arena);
