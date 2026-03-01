@@ -19,13 +19,20 @@
 /*****************************************************************************/
 
 /**
- * \typedef cuds_arena_t
- * \brief
+ * \struct cuds_arena_t
+ * \brief Arena memory allocator structure.
+ *
+ * Memory layout:
+ *   +----------------------+
+ *   | cuds_arena_t header  |
+ *   +----------------------+
+ *   | usable memory block  |
+ *   +----------------------+
  */
 typedef struct
 {
-    size_t capacity;
-    size_t offset;
+    size_t capacity; /**< Total usable capacity in bytes. */
+    size_t offset;   /**< Current allocation offset in bytes. */
 } cuds_arena_t;
 
 /*****************************************************************************/
@@ -33,37 +40,43 @@ typedef struct
 /*****************************************************************************/
 
 /**
- * \brief
- * \param[in] v_capacity
- * \return
+ * \brief Create a new arena allocator and allocate memory.
+ * \param[in] v_capacity Capacity of arena in bytes.
+ * \return Pointer to a newly created arena on success, otherwise `NULL` on failure.
+ * \note `errno` is set to ENOMEM on allocation failure.
  */
 extern CUDS_API cuds_arena_t *cuds_arena_create(size_t v_capacity);
 
 /**
- * \brief
- * \param[in] p_self
- * \return
+ * \brief Destroy an arena and release its memory.
+ * \param[in] p_self Pointer to arena instance.
+ * \return `NULL`, to set back pointer to arena to prevent use after-free.
+ * \note `errno` is set to EINVAL if `p_self` is `NULL`.
+ * \warning All pointers previously returned by `cuds_arena_alloc` become invalid after this call.
  */
 extern CUDS_API cuds_arena_t *cuds_arena_destroy(cuds_arena_t *p_self);
 
 /**
- * \brief
- * \param[in] p_self
- * \param[in] v_size
- * \return
+ * \brief Allocate and zero-initialize memory from an arena.
+ * \param[in] p_self Pointer to arena instance.
+ * \param[in] v_size Number of bytes to allocate.
+ * \return Pointer to allocated memory on success, otherwise `NULL` on failure.
+ * \note `errno` is set to EINVAL if `p_self` is `NULL` or `v_size` is 0, and ENOMEM if not enough remaining space.
+ * \note Allocated memory remains valid until the arena is reset or destroyed.
  */
 extern CUDS_API void *cuds_arena_alloc(cuds_arena_t *p_self, size_t v_size);
 
 /**
- * \brief
- * \param[in] p_self
- * \return
+ * \brief Get remaining free space in the arena.
+ * \param[in] p_self Pointer to arena instance.
+ * \return Number of remaining free bytes.
+ * \note `errno` is set to EINVAL if `p_self` is `NULL`.
  */
 extern CUDS_API size_t cuds_arena_remaining(cuds_arena_t *p_self);
 
 /**
- * \brief
- * \param[in] p_self
+ * \brief Resets the arena without releasing memory.
+ * \param[in] p_self Pointer to arena instance.
  */
 extern CUDS_API void cuds_arena_reset(cuds_arena_t *p_self);
 

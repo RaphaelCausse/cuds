@@ -17,12 +17,12 @@
 /*****************************************************************************/
 
 /**
- * \brief
+ * \brief Offset from arena base to usable memory.
  */
 #define CUDS_ARENA_BASE (sizeof(cuds_arena_t))
 
 /**
- * \brief
+ * \brief Default alignment for allocations.
  */
 #define CUDS_ARENA_ALIGN (sizeof(void *))
 
@@ -50,10 +50,12 @@ cuds_arena_t *cuds_arena_create(size_t v_capacity)
 
 cuds_arena_t *cuds_arena_destroy(cuds_arena_t *p_self)
 {
-    if (p_self != NULL)
+    if (p_self == NULL)
     {
-        free(p_self);
+        errno = EINVAL;
+        return NULL;
     }
+    free(p_self);
     return NULL;
 }
 
@@ -68,13 +70,14 @@ void *cuds_arena_alloc(cuds_arena_t *p_self, size_t v_size)
     void *p_memory_out = NULL;
     size_t v_offset_aligned = CUDS_ALIGN_UP(p_self->offset, CUDS_ARENA_ALIGN);
 
-    if (v_size > (p_self->capacity - v_offset_aligned))
+    if ((v_offset_aligned > p_self->capacity) || (v_size > (p_self->capacity - v_offset_aligned)))
     {
         errno = ENOMEM;
         return NULL;
     }
 
     p_self->offset = v_offset_aligned + v_size;
+
     p_memory_out = (void *)((byte_t *)p_self + CUDS_ARENA_BASE + v_offset_aligned);
     memset(p_memory_out, 0, v_size);
 
@@ -85,6 +88,11 @@ size_t cuds_arena_remaining(cuds_arena_t *p_self)
 {
     if (p_self == NULL)
     {
+        errno = EINVAL;
+        return 0;
+    }
+    if (p_self->offset >= p_self->capacity)
+    {
         return 0;
     }
     return (p_self->capacity - p_self->offset);
@@ -94,6 +102,7 @@ void cuds_arena_reset(cuds_arena_t *p_self)
 {
     if (p_self == NULL)
     {
+        errno = EINVAL;
         return;
     }
     p_self->offset = 0;
