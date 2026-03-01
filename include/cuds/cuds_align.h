@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library alignment.
  *****************************************************************************/
 
-#ifndef _CUDS_ALIGN_H
-#define _CUDS_ALIGN_H
+#ifndef CUDS_ALIGN_H
+#define CUDS_ALIGN_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -35,4 +35,4 @@
 #define CUDS_ALIGN_DOWN(value, alignment) \
     ((size_t)(value) & ~((size_t)(alignment) - 1))
 
-#endif /* _CUDS_ALIGN_H */
+#endif /* CUDS_ALIGN_H */

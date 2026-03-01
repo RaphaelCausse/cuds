@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library API symbol visibility and ABI control.
  *****************************************************************************/
 
-#ifndef _CUDS_API_H
-#define _CUDS_API_H
+#ifndef CUDS_API_H
+#define CUDS_API_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -35,4 +35,4 @@
 #endif /* CUDS_SHARED */
 #endif /* CUDS_PLATFORM_WINDOWS */
 
-#endif /* _CUDS_API_H */
+#endif /* CUDS_API_H */

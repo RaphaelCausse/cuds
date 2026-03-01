@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library units handleling.
  *****************************************************************************/
 
-#ifndef _CUDS_UNITS_H
-#define _CUDS_UNITS_H
+#ifndef CUDS_UNITS_H
+#define CUDS_UNITS_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -41,4 +41,4 @@
  */
 #define CUDS_GB(n) ((size_t)(n) << 30)
 
-#endif /* _CUDS_UNITS_H */
+#endif /* CUDS_UNITS_H */

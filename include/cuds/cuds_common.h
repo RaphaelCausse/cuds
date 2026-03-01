@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library common includes.
  *****************************************************************************/
 
-#ifndef _CUDS_COMMON_H
-#define _CUDS_COMMON_H
+#ifndef CUDS_COMMON_H
+#define CUDS_COMMON_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -35,4 +35,4 @@
  */
 #define cuds_max(x, y) (((x) > (y)) ? (x) : (y))
 
-#endif /* _CUDS_COMMON_H */
+#endif /* CUDS_COMMON_H */

@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library arena memory allocator.
  *****************************************************************************/
 
-#ifndef _CUDS_ARENA_H
-#define _CUDS_ARENA_H
+#ifndef CUDS_ARENA_H
+#define CUDS_ARENA_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -67,4 +67,4 @@ extern CUDS_API size_t cuds_arena_remaining(cuds_arena_t *p_self);
  */
 extern CUDS_API void cuds_arena_reset(cuds_arena_t *p_self);
 
-#endif /* _CUDS_ARENA_H */
+#endif /* CUDS_ARENA_H */

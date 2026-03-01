@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library version.
  *****************************************************************************/
 
-#ifndef _CUDS_VERSION_H
-#define _CUDS_VERSION_H
+#ifndef CUDS_VERSION_H
+#define CUDS_VERSION_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -118,4 +118,4 @@ extern CUDS_API uint32_t cuds_version(void);
  */
 extern CUDS_API const char *cuds_revision(void);
 
-#endif /* _CUDS_VERSION_H */
+#endif /* CUDS_VERSION_H */

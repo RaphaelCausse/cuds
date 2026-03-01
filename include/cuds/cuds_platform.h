@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library platform dectection.
  *****************************************************************************/
 
-#ifndef _CUDS_PLATFORM_H
-#define _CUDS_PLATFORM_H
+#ifndef CUDS_PLATFORM_H
+#define CUDS_PLATFORM_H
 
 /*****************************************************************************/
 /* INCLUDES */
@@ -24,4 +24,4 @@
  */
 extern CUDS_API const char *cuds_platform(void);
 
-#endif /* _CUDS_PLATFORM_H */
+#endif /* CUDS_PLATFORM_H */

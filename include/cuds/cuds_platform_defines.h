@@ -4,8 +4,8 @@
  * \brief Public header for CUDS library platform detection.
  *****************************************************************************/
 
-#ifndef _CUDS_PLATFORM_DEFINES_H
-#define _CUDS_PLATFORM_DEFINES_H
+#ifndef CUDS_PLATFORM_DEFINES_H
+#define CUDS_PLATFORM_DEFINES_H
 
 /*****************************************************************************/
 /* MACROS */
@@ -48,4 +48,4 @@
 #define CUDS_POSIX
 #endif /* POSIX */
 
-#endif /* _CUDS_PLATFORM_DEFINES_H */
+#endif /* CUDS_PLATFORM_DEFINES_H */
