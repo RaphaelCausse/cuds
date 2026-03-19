@@ -4,6 +4,7 @@
 
 set(CUDS_TESTS
     test_cuds
+    test_arena
     test_version
 )
 

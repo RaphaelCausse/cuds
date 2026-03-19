@@ -4,18 +4,18 @@
  * \brief Public header for CUDS library version.
  *****************************************************************************/
 
-#ifndef _CUDS_VERSION_H
-#define _CUDS_VERSION_H
+#ifndef CUDS_VERSION_H
+#define CUDS_VERSION_H
 
-//-----------------------------------------------------------------------------
-// Includes
-//-----------------------------------------------------------------------------
+/*****************************************************************************/
+/* INCLUDES */
+/*****************************************************************************/
 
 #include "cuds/cuds_common.h"
 
-//-----------------------------------------------------------------------------
-// Version
-//-----------------------------------------------------------------------------
+/*****************************************************************************/
+/* CURRENT VERSION */
+/*****************************************************************************/
 
 /**
  * \brief The current major version of CUDS library.
@@ -37,35 +37,35 @@
  */
 #define CUDS_VERSION_SUFFIX ""
 
-//-----------------------------------------------------------------------------
-// Numerical and string helpers
-//-----------------------------------------------------------------------------
+/*****************************************************************************/
+/* NUMERICAL AND STRING HELPERS */
+/*****************************************************************************/
 
 /**
  * \brief Pack version components into a 32-bit unsigned integer.
  */
 #define CUDS_VERSIONNUM(major, minor, patch) \
-    (((uint32_t)(major) << 16) |             \
-     ((uint32_t)(minor) << 8) |              \
-     ((uint32_t)(patch)))
+    (uint32_t)(((uint32_t)(major) << 16) |   \
+               ((uint32_t)(minor) << 8) |    \
+               ((uint32_t)(patch)))
 
 /**
  * \brief Extract the major version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MAJOR(version) \
-    ((uint8_t)(((version) >> 16) & 0xFF))
+    ((uint32_t)(((version) >> 16) & 0xFF))
 
 /**
  * \brief Extract the minor version from a numeric version.
  */
 #define CUDS_VERSIONNUM_MINOR(version) \
-    ((uint8_t)(((version) >> 8) & 0xFF))
+    ((uint32_t)(((version) >> 8) & 0xFF))
 
 /**
  * \brief Extract the patch version from a numeric version.
  */
 #define CUDS_VERSIONNUM_PATCH(version) \
-    ((uint8_t)((version) & 0xFF))
+    ((uint32_t)((version) & 0xFF))
 
 /**
  * \brief Converts a token into a string literal (helper macro, do not use directly, use CUDS_STRINGIFY).
@@ -77,9 +77,9 @@
  */
 #define CUDS_STRINGIFY(x) CUDS_STRINGIFY_HELPER(x)
 
-//-----------------------------------------------------------------------------
-// Current version
-//-----------------------------------------------------------------------------
+/*****************************************************************************/
+/* VERSION HELPERS */
+/*****************************************************************************/
 
 /**
  * \brief Numeric version of the current CUDS library.
@@ -100,9 +100,9 @@
 #define CUDS_VERSION_ATLEAST(x, y, z) \
     (CUDS_VERSION >= CUDS_VERSIONNUM((x), (y), (z)))
 
-//-----------------------------------------------------------------------------
-// Functions
-//-----------------------------------------------------------------------------
+/*****************************************************************************/
+/* FUNCTIONS */
+/*****************************************************************************/
 
 /**
  * \brief Get the current version of CUDS library that is linked against.
@@ -118,4 +118,4 @@ extern CUDS_API uint32_t cuds_version(void);
  */
 extern CUDS_API const char *cuds_revision(void);
 
-#endif /* _CUDS_VERSION_H */
+#endif /* CUDS_VERSION_H */

@@ -6,12 +6,9 @@ set(CUDS_SOURCES
     # Main sources
     cuds.c
     # Modules sources
+    arena/arena.c
     platform/platform.c
     version/version.c
-)
-
-set(CUDS_INTERNAL_HEADERS
-    # Internal headers
 )
 
 # --------------------------------------------------
