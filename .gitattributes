@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Sources
+*.c   text eol=lf diff=cpp
+*.h   text eol=lf diff=cpp
+*.md  text eol=lf diff=markdown
+Makefile text eol=lf
+*.mk  text eol=lf
+*.sh  text eol=lf

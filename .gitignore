@@ -1,0 +1,32 @@
+# Build
+build/
+lib/
+*.o
+*.obj
+*.d
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exp
+*.pdb
+*.ilk
+*.exe
+*.out
+*.dSYM/
+
+# Tooling
+*.log
+*.bak
+
+# IDE
+.vscode/
+*.code-workspace
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
