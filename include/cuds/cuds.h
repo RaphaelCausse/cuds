@@ -13,6 +13,7 @@
 /*****************************************************************************/
 
 #include "cuds/export.h"
+#include "cuds/platform.h"
 #include "cuds/version.h"
 
 #endif /* CUDS_H */
