@@ -23,9 +23,9 @@ PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 # VERSION (read from the source)
 #==============================================================================
 
-VERSION_H  := include/cuds/version.h
-fn_cuds_ver = $(shell sed -n 's/^\#define CUDS_VERSION_$(1)[[:space:]][[:space:]]*\([0-9][0-9]*\).*/\1/p' $(VERSION_H))
+fn_cuds_ver = $(shell awk -v macro='CUDS_VERSION_$(1)' '$$1 == "#define" && $$2 == macro { value = $$3; sub(/\r$$/, "", value); if (value ~ /^[0-9]+$$/) { print value; exit } }' "$(VERSION_H)")
 
+VERSION_H     := include/cuds/version.h
 VERSION_MAJOR := $(call fn_cuds_ver,MAJOR)
 VERSION_MINOR := $(call fn_cuds_ver,MINOR)
 VERSION_PATCH := $(call fn_cuds_ver,PATCH)
@@ -58,24 +58,24 @@ INSTALL_LINKS   := :
 SHARED_POSTLINK := :
 
 ifeq ($(PLATFORM),linux)
-  SHARED_NAME     := lib$(NAME).so.$(VERSION)
+  CPPFLAGS_PLAT   := -D_DEFAULT_SOURCE
   SONAME          := lib$(NAME).so.$(VERSION_MAJOR)
+  SHARED_NAME     := lib$(NAME).so.$(VERSION)
   LDFLAGS_SHARED   = -shared -Wl,-soname,$(SONAME)
   SHARED_POSTLINK  = ln -sf $(SHARED_NAME) $(@D)/$(SONAME) && ln -sf $(SONAME) $(@D)/lib$(NAME).so
   INSTALL_LINKS   := cd $(DESTDIR)$(LIBDIR) && ln -sf $(SHARED_NAME) $(SONAME) && ln -sf $(SONAME) lib$(NAME).so
-  CPPFLAGS_PLAT   := -D_POSIX_C_SOURCE=200809L
 else ifeq ($(PLATFORM),windows)
+  CFLAGS_SHARED   :=
   EXE_EXT         := .exe
   SHARED_NAME     := $(NAME).dll
   LDFLAGS_SHARED   = -shared -Wl,--out-implib,$(@D)/lib$(NAME).dll.a
-  CFLAGS_SHARED   :=
 else ifeq ($(PLATFORM),macos)
   SHARED_NAME     := lib$(NAME).dylib
   LDFLAGS_SHARED   = -dynamiclib -install_name $(LIBDIR)/$(SHARED_NAME)
 else
+  CPPFLAGS_PLAT   := -D_DEFAULT_SOURCE
   SHARED_NAME     := lib$(NAME).so
   LDFLAGS_SHARED   = -shared
-  CPPFLAGS_PLAT   := -D_POSIX_C_SOURCE=200809L
 endif
 
 
@@ -100,7 +100,9 @@ DIR_BIN_DEBUG     := $(DIR_BIN)/debug
 DIR_BIN_RELEASE   := $(DIR_BIN)/release
 
 ### Source files
-SOURCES := $(wildcard $(DIR_SRC)/*.c $(DIR_SRC)/*/*.c)
+SOURCES := \
+	${DIR_SRC}/platform.c \
+	${DIR_SRC}/version.c
 
 ### Header files
 HEADERS := $(wildcard $(DIR_INCLUDE)/$(NAME)/*.h)
@@ -131,7 +133,7 @@ EXAMPLES_RELEASE := $(patsubst $(DIR_EXAMPLES)/%.c,$(DIR_BIN_RELEASE)/examples/%
 
 
 #==============================================================================
-# COMPILER AND LINKER
+# TOOLCHAIN
 #==============================================================================
 
 ### C Compiler
@@ -139,36 +141,42 @@ CC := gcc
 
 ### C standard and warnings
 CSTD := -std=c99
-WARN := -Wall -Wextra -Wpedantic
-
-### Extra flags to give to the C compiler
-CFLAGS += $(CSTD) $(WARN)
-
-### Build mode specific C compiler flags
-CFLAGS_DEBUG   := -O0 -g3 -DDEBUG -fanalyzer
-CFLAGS_RELEASE := -O2 -g0 -DNDEBUG
+WARN := -Wall -Wextra -Wpedantic -Wconversion -Wshadow
 
 ### Extra flags to give to the C preprocessor (e.g. -I, -D, -U ...)
 CPPFLAGS += -I$(DIR_INCLUDE) $(CPPFLAGS_PLAT) -DCUDS_REVISION='"$(REVISION)"'
-
-### Preprocessor flags specific to the shared library
-CPPFLAGS_SHARED := -D_CUDS_SHARED -D_CUDS_BUILDING
 
 ### Build mode specific C preprocessor flags
 CPPFLAGS_DEBUG   := -D_CUDS_DEBUG
 CPPFLAGS_RELEASE := -D_CUDS_RELEASE
 
+### Shared library specific preprocessor flags 
+CPPFLAGS_SHARED := -D_CUDS_SHARED -D_CUDS_BUILDING
+
+### Extra flags to give to the C compiler
+CFLAGS += $(CSTD) $(WARN) -fno-omit-frame-pointer
+
+### Build mode specific C compiler flags
+CFLAGS_DEBUG   := -O0 -g3 -DDEBUG
+CFLAGS_RELEASE := -O2 -g0 -DNDEBUG
+CFLAGS_SAN     := -fsanitize=address,undefined
+
 ### Dependency flags
 DEPFLAGS := -MMD -MP
 
-### Extra flags given to the compiler when it invokes the linker (e.g. -L ...)
+### Extra flags given to the linker (e.g. -L ...)
 LDFLAGS +=
+
+### Build mode specific linker flags
+LDFLAGS_DEBUG   :=
+LDFLAGS_RELEASE :=
+LDFLAGS_SAN     := $(CFLAGS_SAN)
 
 ### Library names given to the linker (e.g. -l ...)
 LDLIBS +=
 
 ### Archiver for static library
-AR := gcc-ar
+AR := ar
 
 ### Archiver flags
 ARFLAGS := rcs
@@ -182,14 +190,14 @@ MKDIR   := mkdir -p
 RM      := rm -f
 RMDIR   := rm -rf
 CP      := cp -R
-INSTALL ?= install
+INSTALL := install
 
 
 #==============================================================================
-# VERBOSITY ("make v=1" or "make verbose=1")
+# VERBOSITY ("make V=1" or "make verbose=1")
 #==============================================================================
 
-VERBOSE := $(or $(v),$(verbose))
+VERBOSE := $(or $(V),$(verbose))
 ifeq ($(VERBOSE),)
   Q := @
 else
@@ -211,6 +219,11 @@ $(DIR_BUILD_RELEASE)/%: CFLAGS += $(CFLAGS_RELEASE)
 $(DIR_BIN_DEBUG)/%:     CFLAGS += $(CFLAGS_DEBUG)
 $(DIR_BIN_RELEASE)/%:   CFLAGS += $(CFLAGS_RELEASE)
 
+$(DIR_LIB_DEBUG)/%:   LDFLAGS += $(LDFLAGS_DEBUG)
+$(DIR_LIB_RELEASE)/%: LDFLAGS += $(LDFLAGS_RELEASE)
+$(DIR_BIN_DEBUG)/%:   LDFLAGS += $(LDFLAGS_DEBUG)
+$(DIR_BIN_RELEASE)/%: LDFLAGS += $(LDFLAGS_RELEASE)
+
 
 #==============================================================================
 # RECIPES
@@ -218,34 +231,33 @@ $(DIR_BIN_RELEASE)/%:   CFLAGS += $(CFLAGS_RELEASE)
 
 define RECIPE_CC_STATIC
 	@$(MKDIR) $(dir $@)
-	@echo "  CC    $@"
+	@echo "  CC  $@"
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
 endef
 
 define RECIPE_CC_SHARED
 	@$(MKDIR) $(dir $@)
-	@echo "  CC    $@"
+	@echo "  CC  $@"
 	$(Q)$(CC) $(CPPFLAGS) $(CPPFLAGS_SHARED) $(CFLAGS) $(CFLAGS_SHARED) $(DEPFLAGS) -c $< -o $@
 endef
 
 define RECIPE_AR
 	@$(MKDIR) $(dir $@)
 	@$(RM) $@
-	@echo "  AR    $@"
+	@echo "  AR  $@"
 	$(Q)$(AR) $(ARFLAGS) $@ $^
 endef
 
 define RECIPE_LD_SHARED
 	@$(MKDIR) $(dir $@)
-	@echo "  LD    $@"
-	$(Q)$(CC) $(LDFLAGS_SHARED) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	@echo "  LD  $@"
+	$(Q)$(CC) $(LDFLAGS) $(LDFLAGS_SHARED) -o $@ $^ $(LDLIBS)
 	$(Q)$(SHARED_POSTLINK)
 endef
 
-# Example binaries: one source file linked with the static library
 define RECIPE_BIN
 	@$(MKDIR) $(dir $@)
-	@echo "  CC    $@"
+	@echo "  CC  $@"
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $< $(filter %.a,$^) $(LDFLAGS) $(LDLIBS) -o $@
 endef
 
@@ -264,7 +276,7 @@ $(if $(filter __%,$(MAKECMDGOALS)),$(error Rules prefixed with "__" are only for
 #------------------------------------------------------------------------------
 # (Internal) Check configuration
 #------------------------------------------------------------------------------
-.PHONY: __check_conf
+.PHONY: __check_conf 
 
 __check_conf:
 ifeq ($(VERSION_MAJOR)$(VERSION_MINOR)$(VERSION_PATCH),)
@@ -273,14 +285,17 @@ endif
 ifeq ($(SOURCES),)
 	$(error No source file found in $(DIR_SRC)/)
 endif
+ifneq ($(VERBOSE),)
+	$(info Platform $(PLATFORM))
+endif
 
 
 #------------------------------------------------------------------------------
-# Build operations (debug)
+# Build (debug)
 #------------------------------------------------------------------------------
 .PHONY: debug debug-static debug-shared
 
-debug: __check_conf debug-static debug-shared
+debug: debug-static debug-shared
 
 debug-static: __check_conf $(LIB_STATIC_DEBUG)
 
@@ -288,15 +303,25 @@ debug-shared: __check_conf $(LIB_SHARED_DEBUG)
 
 
 #------------------------------------------------------------------------------
-# Build operations (release)
+# Build (release)
 #------------------------------------------------------------------------------
 .PHONY: release release-static release-shared
 
-release: __check_conf release-static release-shared
+release: release-static release-shared
 
 release-static: __check_conf $(LIB_STATIC_RELEASE)
 
 release-shared: __check_conf $(LIB_SHARED_RELEASE)
+
+
+#------------------------------------------------------------------------------
+# Build with sanitizers (debug)
+#------------------------------------------------------------------------------
+.PHONY: sanitize
+
+sanitize: CFLAGS += $(CFLAGS_SAN)
+sanitize: LDFLAGS += $(LDFLAGS_SAN)
+sanitize: debug-static debug-shared
 
 
 #------------------------------------------------------------------------------
@@ -352,39 +377,39 @@ examples-release: __check_conf $(EXAMPLES_RELEASE)
 
 
 #------------------------------------------------------------------------------
-# Installation
+# (Internal) Installation
 #------------------------------------------------------------------------------
-.PHONY:  __install_headers __install-static __install_shared __install_pkgconfig install uninstall
+.PHONY: __install_headers __install_static __install_shared __install_pkgconfig
 
 __install_headers:
 	$(Q)$(INSTALL) -d $(DESTDIR)$(INCLUDEDIR)/$(NAME)
-	@echo "  INSTALL    $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/$(NAME)/"
+	@echo "  INSTALL  $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/$(NAME)/"
 	$(Q)$(CP) $(DIR_INCLUDE)/$(NAME)/. $(DESTDIR)$(INCLUDEDIR)/$(NAME)/
 
 __install_static: release-static
 	$(Q)$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	@echo "  INSTALL    $(NAME) static library in $(DESTDIR)$(LIBDIR)/"
+	@echo "  INSTALL  $(NAME) static library in $(DESTDIR)$(LIBDIR)/"
 	$(Q)$(INSTALL) -m 644 $(LIB_STATIC_RELEASE) $(DESTDIR)$(LIBDIR)/
 
 ifeq ($(PLATFORM),windows)
 __install_shared: release-shared
 	$(Q)$(INSTALL) -d $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR)
-	@echo "  INSTALL    $(NAME) shared library in $(DESTDIR)$(BINDIR)/"
+	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(BINDIR)/"
 	$(Q)$(INSTALL) -m 755 $(LIB_SHARED_RELEASE) $(DESTDIR)$(BINDIR)/
-	@echo "  INSTALL    $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
+	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
 	$(Q)$(INSTALL) -m 644 $(DIR_LIB_RELEASE)/lib$(NAME).dll.a $(DESTDIR)$(LIBDIR)/
 else
 __install_shared: release-shared
 	$(Q)$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	@echo "  INSTALL    $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
+	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
 	$(Q)$(INSTALL) -m 755 $(LIB_SHARED_RELEASE) $(DESTDIR)$(LIBDIR)/
-	@echo "  INSTALL    $(LIB_SHARED_RELEASE) symlinks"
+	@echo "  INSTALL  $(LIB_SHARED_RELEASE) symlinks"
 	$(Q)$(INSTALL_LINKS)
 endif
 
 __install_pkgconfig:
 	$(Q)$(INSTALL) -d $(DESTDIR)$(PKGCONFIGDIR)
-	@echo "  INSTALL    $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)/"
+	@echo "  INSTALL  $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)/"
 	$(Q)printf '%s\n' \
 		'prefix=$(PREFIX)' \
 		'libdir=$(LIBDIR)' \
@@ -397,41 +422,47 @@ __install_pkgconfig:
 		'Cflags: -I$${includedir}' \
 		> $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc
 
-install: __install_headers __install-static __install_shared __install_pkgconfig
+
+#------------------------------------------------------------------------------
+# Installation
+#------------------------------------------------------------------------------
+.PHONY: install uninstall
+
+install: __install_headers __install_static __install_shared __install_pkgconfig
 
 uninstall:
-	@echo "  RM    $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/"
+	@echo "  RM  $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/"
 	@$(RMDIR) $(DESTDIR)$(INCLUDEDIR)/$(NAME)
-	@echo "  RM    $(NAME) static library in $(DESTDIR)$(LIBDIR)"
+	@echo "  RM  $(NAME) static library in $(DESTDIR)$(LIBDIR)"
 	@$(RM) $(DESTDIR)$(LIBDIR)/lib$(NAME).a $(DESTDIR)$(LIBDIR)/lib$(NAME).dll.a
-	@echo "  RM    $(NAME) shared library in $(DESTDIR)$(LIBDIR)"
+	@echo "  RM  $(NAME) shared library in $(DESTDIR)$(LIBDIR)"
 	@$(RM) $(DESTDIR)$(LIBDIR)/lib$(NAME).so* $(DESTDIR)$(LIBDIR)/lib$(NAME).dylib 
-	@echo "  RM    $(NAME) shared library in $(DESTDIR)$(BINDIR)"
+	@echo "  RM  $(NAME) shared library in $(DESTDIR)$(BINDIR)"
 	@$(RM) $(DESTDIR)$(BINDIR)/$(NAME).dll
-	@echo "  RM    $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)"
+	@echo "  RM  $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)"
 	@$(RM) $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc
 
 
 #------------------------------------------------------------------------------
 # Clean generated files
 #------------------------------------------------------------------------------
-.PHONY: clean clean-debug clean-release cleanall
+.PHONY: clean clean-debug clean-release distclean
 
 clean: clean-debug clean-release
 
 clean-debug:
 	@for d in $(DIR_BUILD_DEBUG) $(DIR_LIB_DEBUG) $(DIR_BIN_DEBUG); do \
-	    if [ -d $$d ]; then echo "  RM    $$d/"; $(RMDIR) $$d; fi; \
+	    if [ -d $$d ]; then echo "  RM  $$d/"; $(RMDIR) $$d; fi; \
 	done
 
 clean-release:
 	@for d in $(DIR_BUILD_RELEASE) $(DIR_LIB_RELEASE) $(DIR_BIN_RELEASE); do \
-	    if [ -d $$d ]; then echo "  RM    $$d/"; $(RMDIR) $$d; fi; \
+	    if [ -d $$d ]; then echo "  RM  $$d/"; $(RMDIR) $$d; fi; \
 	done
 
-cleanall:
+distclean:
 	@for d in $(DIR_BUILD) $(DIR_LIB) $(DIR_BIN); do \
-	    if [ -d $$d ]; then echo "  RM    $$d/"; $(RMDIR) $$d; fi; \
+	    if [ -d $$d ]; then echo "  RM  $$d/"; $(RMDIR) $$d; fi; \
 	done
 
 
@@ -456,49 +487,63 @@ info: __version
 	@echo "  CC                $(CC)"
 	@echo "  CPPFLAGS          $(CPPFLAGS)"
 	@echo "  CPPFLAGS_DEBUG    $(CPPFLAGS_DEBUG)"
-	@echo "  CPPFLAGS_RELEASE  $(CPPFLAGS_RELEASE)""
+	@echo "  CPPFLAGS_RELEASE  $(CPPFLAGS_RELEASE)"
 	@echo "  CPPFLAGS_SHARED   $(CPPFLAGS_SHARED)"
 	@echo "  CFLAGS            $(CFLAGS)"
 	@echo "  CFLAGS_DEBUG      $(CFLAGS_DEBUG)"
 	@echo "  CFLAGS_RELEASE    $(CFLAGS_RELEASE)"
 	@echo "  CFLAGS_SHARED     $(CFLAGS_SHARED)"
+	@echo "  CFLAGS_SAN        $(CFLAGS_SAN)"
 	@echo "  DEPFLAGS          $(DEPFLAGS)"
 	@echo "  LDFLAGS           $(LDFLAGS)"
+	@echo "  LDFLAGS_DEBUG     $(LDFLAGS_DEBUG)"
+	@echo "  LDFLAGS_RELEASE   $(LDFLAGS_RELEASE)"
 	@echo "  LDFLAGS_SHARED    $(LDFLAGS_SHARED)"
+	@echo "  LDFLAGS_SAN       $(LDFLAGS_SAN)"
 	@echo "  LDLIBS            $(LDLIBS)"
 	@echo "  AR                $(AR)"
 	@echo "  ARFLAGS           $(ARFLAGS)"
 	@echo ""
 
 version: __version
-	@echo "----------------------------------------"
+	@echo "===== MAKE ================================================="
 	@$(MAKE) --version
-	@echo "----------------------------------------"
+	@echo ""
+	@echo "===== CC ==================================================="
 	@$(CC) --version
-	@echo "----------------------------------------"
+	@echo ""
+	@echo "===== AR ==================================================="
 	@$(AR) --version
-	@echo "----------------------------------------"
+	@echo ""
 
 help: __version
-	@echo "Targets:"
+	@echo "Build targets:"
 	@echo "  debug              Build static + shared libraries (debug)"
 	@echo "  debug-static       Build only the static library (debug)"
 	@echo "  debug-shared       Build only the shared library (debug)"
 	@echo "  release            Build static + shared libraries (release)"
 	@echo "  release-static     Build only the static library (release)"
 	@echo "  release-shared     Build only the shared library (release)"
-	@echo "  examples           Build the examples (debug + release)"
-	@echo "  examples-debug     Build the examples (debug)"
-	@echo "  examples-release   Build the examples (release)"
+	@echo ""
+	@echo "Install targets:"
 	@echo "  install            Install the release build files"
 	@echo "  uninstall          Remove the installed files"
+	@echo ""
+	@echo "Clean targets:"
 	@echo "  clean              Clean generated files (debug + release)"
 	@echo "  clean-debug        Clean generated files (debug)"
 	@echo "  clean-release      Clean generated files (release)"
-	@echo "  cleanall           Clean generated files and directories"
-	@echo "  info               Display project informations"
-	@echo "  versions           Display versions"
+	@echo "  distclean          Clean generated directories"
+	@echo ""
+	@echo "Example targets:"
+	@echo "  examples           Build the examples (debug + release)"
+	@echo "  examples-debug     Build the examples (debug)"
+	@echo "  examples-release   Build the examples (release)"
+	@echo ""
+	@echo "Helper targets:"
 	@echo "  help               Display help"
+	@echo "  version            Display versions"
+	@echo "  info               Display project informations"
 	@echo ""
 	@echo "Options:"
 	@echo "  v=1, verbose=1     Enable verbose mode"
