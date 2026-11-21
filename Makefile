@@ -1,16 +1,18 @@
 #==============================================================================
-# CUDS - C Utilities and Data Structures
-# Cross-platform Makefile
+# Makefile for CUDS - C Utilities and Data Structures
+# Author: Raphael CAUSSE
 #==============================================================================
 
+### Project
 NAME        := cuds
 DESCRIPTION := C Utilities and Data Structures
 
 
 #==============================================================================
-# INSTALL OPTIONS
+# INSTALLATION
 #==============================================================================
 
+### Install directories
 PREFIX       ?= /usr/local
 DESTDIR      ?=
 BINDIR       ?= $(PREFIX)/bin
@@ -20,23 +22,41 @@ PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
 
 
 #==============================================================================
-# VERSION (read from the source)
+# REQUIRED TOOLS
 #==============================================================================
 
-fn_cuds_ver = $(shell awk -v macro='CUDS_VERSION_$(1)' '$$1 == "#define" && $$2 == macro { value = $$3; sub(/\r$$/, "", value); if (value ~ /^[0-9]+$$/) { print value; exit } }' "$(VERSION_H)")
+REQUIRED_TOOLS := awk git
+
+### Hint message when a tool is missing (TOOL_HINT_<tool>)
+TOOL_HINT_awk := the version cannot be read from the sources
+TOOL_HINT_git := the revision will be "norevision"
+
+fn_tool_missing = $(if $(shell command -v $(1) 2>/dev/null),,$(1))
+
+MISSING_TOOLS := $(strip $(foreach t,$(REQUIRED_TOOLS),$(call fn_tool_missing,$(t))))
+
+$(foreach t,$(MISSING_TOOLS),$(warning Required tool "$(t)" not found in PATH: $(TOOL_HINT_$(t))))
+
+
+#==============================================================================
+# VERSION
+#==============================================================================
+
+fn_cuds_version = $(if $(filter awk,$(MISSING_TOOLS)),,$(shell awk -v macro='CUDS_VERSION_$(1)' '$$1 == "#define" && $$2 == macro { value = $$3; sub(/\r$$/, "", value); if (value ~ /^[0-9]+$$/) { print value; exit } }' "$(VERSION_H)"))
 
 VERSION_H     := include/cuds/version.h
-VERSION_MAJOR := $(call fn_cuds_ver,MAJOR)
-VERSION_MINOR := $(call fn_cuds_ver,MINOR)
-VERSION_PATCH := $(call fn_cuds_ver,PATCH)
+VERSION_MAJOR := $(call fn_cuds_version,MAJOR)
+VERSION_MINOR := $(call fn_cuds_version,MINOR)
+VERSION_PATCH := $(call fn_cuds_version,PATCH)
 VERSION       := $(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
-REVISION      := $(shell git rev-parse --short HEAD 2>/dev/null || echo norevision)
+REVISION      := $(if $(filter git,$(MISSING_TOOLS)),norevision,$(shell git rev-parse --short HEAD 2>/dev/null || echo norevision))
 
 
 #==============================================================================
-# PLATFORM DETECTION
+# PLATFORM
 #==============================================================================
 
+### Platform detection
 ifeq ($(OS),Windows_NT)
   PLATFORM := windows
 else
@@ -50,7 +70,7 @@ else
   endif
 endif
 
-# Platform specifics
+### Platform specifics
 EXE_EXT         :=
 CPPFLAGS_PLAT   :=
 CFLAGS_SHARED   := -fPIC -fvisibility=hidden
@@ -61,9 +81,9 @@ ifeq ($(PLATFORM),linux)
   CPPFLAGS_PLAT   := -D_DEFAULT_SOURCE
   SONAME          := lib$(NAME).so.$(VERSION_MAJOR)
   SHARED_NAME     := lib$(NAME).so.$(VERSION)
-  LDFLAGS_SHARED   = -shared -Wl,-soname,$(SONAME)
-  SHARED_POSTLINK  = ln -sf $(SHARED_NAME) $(@D)/$(SONAME) && ln -sf $(SONAME) $(@D)/lib$(NAME).so
+  LDFLAGS_SHARED  := -shared -Wl,-soname,$(SONAME)
   INSTALL_LINKS   := cd $(DESTDIR)$(LIBDIR) && ln -sf $(SHARED_NAME) $(SONAME) && ln -sf $(SONAME) lib$(NAME).so
+  SHARED_POSTLINK  = ln -sf $(SHARED_NAME) $(@D)/$(SONAME) && ln -sf $(SONAME) $(@D)/lib$(NAME).so
 else ifeq ($(PLATFORM),windows)
   CFLAGS_SHARED   :=
   EXE_EXT         := .exe
@@ -71,11 +91,11 @@ else ifeq ($(PLATFORM),windows)
   LDFLAGS_SHARED   = -shared -Wl,--out-implib,$(@D)/lib$(NAME).dll.a
 else ifeq ($(PLATFORM),macos)
   SHARED_NAME     := lib$(NAME).dylib
-  LDFLAGS_SHARED   = -dynamiclib -install_name $(LIBDIR)/$(SHARED_NAME)
+  LDFLAGS_SHARED  := -dynamiclib -install_name $(LIBDIR)/$(SHARED_NAME)
 else
   CPPFLAGS_PLAT   := -D_DEFAULT_SOURCE
   SHARED_NAME     := lib$(NAME).so
-  LDFLAGS_SHARED   = -shared
+  LDFLAGS_SHARED  := -shared
 endif
 
 
@@ -83,13 +103,13 @@ endif
 # DIRECTORIES AND FILES
 #==============================================================================
 
-### Base directories
+### Project directories
 DIR_SRC      := src
 DIR_INCLUDE  := include
-DIR_EXAMPLES := examples
+DIR_BIN      := bin
 DIR_BUILD    := build
 DIR_LIB      := lib
-DIR_BIN      := bin
+DIR_EXAMPLES := examples
 
 ### Generation directories
 DIR_BUILD_DEBUG   := $(DIR_BUILD)/debug
@@ -103,9 +123,6 @@ DIR_BIN_RELEASE   := $(DIR_BIN)/release
 SOURCES := \
 	${DIR_SRC}/platform.c \
 	${DIR_SRC}/version.c
-
-### Header files
-HEADERS := $(wildcard $(DIR_INCLUDE)/$(NAME)/*.h)
 
 ### Object files
 OBJ_STATIC_DEBUG   := $(patsubst $(DIR_SRC)/%.c,$(DIR_BUILD_DEBUG)/static/%.o,$(SOURCES))
@@ -147,8 +164,8 @@ WARN := -Wall -Wextra -Wpedantic -Wconversion -Wshadow
 CPPFLAGS += -I$(DIR_INCLUDE) $(CPPFLAGS_PLAT) -DCUDS_REVISION='"$(REVISION)"'
 
 ### Build mode specific C preprocessor flags
-CPPFLAGS_DEBUG   := -D_CUDS_DEBUG
-CPPFLAGS_RELEASE := -D_CUDS_RELEASE
+CPPFLAGS_DEBUG   := -DDEBUG -D_CUDS_DEBUG
+CPPFLAGS_RELEASE := -DNDEBUG -D_CUDS_RELEASE
 
 ### Shared library specific preprocessor flags 
 CPPFLAGS_SHARED := -D_CUDS_SHARED -D_CUDS_BUILDING
@@ -157,8 +174,8 @@ CPPFLAGS_SHARED := -D_CUDS_SHARED -D_CUDS_BUILDING
 CFLAGS += $(CSTD) $(WARN) -fno-omit-frame-pointer
 
 ### Build mode specific C compiler flags
-CFLAGS_DEBUG   := -O0 -g3 -DDEBUG
-CFLAGS_RELEASE := -O2 -g0 -DNDEBUG
+CFLAGS_DEBUG   := -O1 -g3
+CFLAGS_RELEASE := -O2 -g
 CFLAGS_SAN     := -fsanitize=address,undefined
 
 ### Dependency flags
@@ -167,7 +184,7 @@ DEPFLAGS := -MMD -MP
 ### Extra flags given to the linker (e.g. -L ...)
 LDFLAGS +=
 
-### Build mode specific linker flags
+### Build mode specific linker flags	
 LDFLAGS_DEBUG   :=
 LDFLAGS_RELEASE :=
 LDFLAGS_SAN     := $(CFLAGS_SAN)
@@ -194,14 +211,22 @@ INSTALL := install
 
 
 #==============================================================================
-# VERBOSITY ("make V=1" or "make verbose=1")
+# OPTIONS
 #==============================================================================
 
+### VERBOSITY ("make V=1" or "make verbose=1")
 VERBOSE := $(or $(V),$(verbose))
 ifeq ($(VERBOSE),)
   Q := @
 else
   Q :=
+endif
+
+### SANITIZE ("make SAN=1" or "make sanitize=1")
+SANITIZE := $(or $(SAN),$(sanitize))
+ifeq ($(SANITIZE),1)
+  CFLAGS += $(CFLAGS_SAN)
+  LDFLAGS += $(LDFLAGS_SAN)
 endif
 
 
@@ -276,14 +301,20 @@ $(if $(filter __%,$(MAKECMDGOALS)),$(error Rules prefixed with "__" are only for
 #------------------------------------------------------------------------------
 # (Internal) Check configuration
 #------------------------------------------------------------------------------
-.PHONY: __check_conf 
+.PHONY: __check_conf
+
+### Source files check (listed but missing files)
+MISSING_SOURCES := $(filter-out $(wildcard $(SOURCES)),$(SOURCES))
 
 __check_conf:
-ifeq ($(VERSION_MAJOR)$(VERSION_MINOR)$(VERSION_PATCH),)
+ifeq ($(and $(VERSION_MAJOR),$(VERSION_MINOR),$(VERSION_PATCH)),)
 	$(error Cannot read the version from $(VERSION_H))
 endif
 ifeq ($(SOURCES),)
-	$(error No source file found in $(DIR_SRC)/)
+	$(error No source file(s) declared in SOURCES)
+endif
+ifneq ($(MISSING_SOURCES),)
+	$(error Missing source file(s): $(MISSING_SOURCES))
 endif
 ifneq ($(VERBOSE),)
 	$(info Platform $(PLATFORM))
@@ -312,16 +343,6 @@ release: release-static release-shared
 release-static: __check_conf $(LIB_STATIC_RELEASE)
 
 release-shared: __check_conf $(LIB_SHARED_RELEASE)
-
-
-#------------------------------------------------------------------------------
-# Build with sanitizers (debug)
-#------------------------------------------------------------------------------
-.PHONY: sanitize
-
-sanitize: CFLAGS += $(CFLAGS_SAN)
-sanitize: LDFLAGS += $(LDFLAGS_SAN)
-sanitize: debug-static debug-shared
 
 
 #------------------------------------------------------------------------------
@@ -363,10 +384,10 @@ $(DIR_BUILD_RELEASE)/shared/%.o: $(DIR_SRC)/%.c
 #------------------------------------------------------------------------------
 .PHONY: examples examples-debug examples-release
 
-$(DIR_BIN_DEBUG)/examples/%$(EXE_EXT): $(DIR_EXAMPLES)/%.c $(LIB_STATIC_DEBUG) $(HEADERS)
+$(DIR_BIN_DEBUG)/examples/%$(EXE_EXT): $(DIR_EXAMPLES)/%.c $(LIB_STATIC_DEBUG)
 	$(RECIPE_BIN)
 
-$(DIR_BIN_RELEASE)/examples/%$(EXE_EXT): $(DIR_EXAMPLES)/%.c $(LIB_STATIC_RELEASE) $(HEADERS)
+$(DIR_BIN_RELEASE)/examples/%$(EXE_EXT): $(DIR_EXAMPLES)/%.c $(LIB_STATIC_RELEASE)
 	$(RECIPE_BIN)
 
 examples: examples-debug examples-release
@@ -526,14 +547,14 @@ help: __version
 	@echo "  release-shared     Build only the shared library (release)"
 	@echo ""
 	@echo "Install targets:"
-	@echo "  install            Install the release build files"
-	@echo "  uninstall          Remove the installed files"
+	@echo "  install            Install libraries"
+	@echo "  uninstall          Uninstall libraries"
 	@echo ""
 	@echo "Clean targets:"
-	@echo "  clean              Clean generated files (debug + release)"
+	@echo "  clean              Clean all generated files"
 	@echo "  clean-debug        Clean generated files (debug)"
 	@echo "  clean-release      Clean generated files (release)"
-	@echo "  distclean          Clean generated directories"
+	@echo "  distclean          Clean all generated directories"
 	@echo ""
 	@echo "Example targets:"
 	@echo "  examples           Build the examples (debug + release)"
@@ -541,12 +562,13 @@ help: __version
 	@echo "  examples-release   Build the examples (release)"
 	@echo ""
 	@echo "Helper targets:"
-	@echo "  help               Display help"
-	@echo "  version            Display versions"
 	@echo "  info               Display project informations"
+	@echo "  version            Display versions"
+	@echo "  help               Display help"
 	@echo ""
 	@echo "Options:"
-	@echo "  v=1, verbose=1     Enable verbose mode"
+	@echo "  V=1, verbose=1     Enable verbose mode"
+	@echo "  SAN=1, sanitize=1  Enable sanitizers"
 	@echo ""
 
 
