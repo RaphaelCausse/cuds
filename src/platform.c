@@ -22,5 +22,9 @@ const char *cuds_platform(void)
 
 const char *cuds_compiler(void)
 {
+#if defined(CUDS_ENV_MINGW)
+    return CUDS_COMPILER_NAME " (MinGW)";
+#else
     return CUDS_COMPILER_NAME;
+#endif
 }

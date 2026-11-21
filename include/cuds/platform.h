@@ -87,7 +87,7 @@
 /**
  * \brief Defined only for a generic, unrecognized Unix.
  */
-#define CUDS_PLATFORM_GENERIC_UNIX 1
+#define CUDS_PLATFORM_UNIX 1
 #define CUDS_PLATFORM_NAME "unix"
 
 #else
@@ -103,25 +103,35 @@
  * Family: BSD.
  */
 #if defined(CUDS_PLATFORM_FREEBSD) || defined(CUDS_PLATFORM_OPENBSD) || \
-    defined(CUDS_PLATFORM_NETBSD) || defined(CUDS_PLATFORM_DRAGONFLY)
+    defined(CUDS_PLATFORM_NETBSD)  || defined(CUDS_PLATFORM_DRAGONFLY)
+/**
+ * \brief Defined for every BSD-like system.
+ */
 #define CUDS_PLATFORM_BSD 1
 #endif
 
 /**
- * Family: UNIX / POSIX.
+ * Family: POSIX.
  */
 #if defined(CUDS_PLATFORM_LINUX) || defined(CUDS_PLATFORM_APPLE) || \
-    defined(CUDS_PLATFORM_CYGWIN) || defined(CUDS_PLATFORM_BSD) ||  \
-    defined(CUDS_PLATFORM_GENERIC_UNIX)
+    defined(CUDS_PLATFORM_BSD)   || defined(CUDS_PLATFORM_UNIX)  || \
+    defined(CUDS_PLATFORM_CYGWIN)
 /**
- * \brief Defined for every Unix-like system (never together with CUDS_PLATFORM_WINDOWS).
- */
-#define CUDS_PLATFORM_UNIX 1
-/**
- * \brief Defined for POSIX-like systems.
+ * \brief Defined for every POSIX system.
  */
 #define CUDS_PLATFORM_POSIX 1
 #endif
+
+/**
+ * Family: Win32.
+ */
+#if defined(CUDS_PLATFORM_WINDOWS)
+/**
+ * \brief Defined for every Win32 system.
+ */
+#define CUDS_PLATFORM_WIN32 1
+#endif
+
 
 /**
  * Environment: MinGW (a Windows toolchain, not a platform).
@@ -133,6 +143,10 @@
 #define CUDS_ENV_MINGW 1
 #endif
 
+
+/**
+ * Path separator.
+ */
 #if defined(CUDS_PLATFORM_WINDOWS)
 /**
  * \brief Native path separator, as character.
@@ -151,16 +165,7 @@
 /* COMPILER */
 /*****************************************************************************/
 
-#if defined(__clang__)
-/**
- * \brief Defined when compiling with clang.
- */
-#define CUDS_COMPILER_CLANG 1
-#define CUDS_COMPILER_NAME "clang"
-#define CUDS_COMPILER_VERSION \
-    (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-
-#elif defined(__GNUC__)
+#if defined(__GNUC__)
 /**
  * \brief Defined when compiling with gcc.
  */
@@ -168,6 +173,15 @@
 #define CUDS_COMPILER_NAME "gcc"
 #define CUDS_COMPILER_VERSION \
     (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+#elif defined(__clang__)
+/**
+ * \brief Defined when compiling with clang.
+ */
+#define CUDS_COMPILER_CLANG 1
+#define CUDS_COMPILER_NAME "clang"
+#define CUDS_COMPILER_VERSION \
+    (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 
 #elif defined(_MSC_VER)
 /**
@@ -200,21 +214,22 @@
 /** 
  * Portable `static inline` for header-only helpers.
  */
-#if defined(CUDS_COMPILER_MSVC)
-#define CUDS_INLINE static __inline
-#define CUDS_FORCE_INLINE static __forceinline
-#define CUDS_NOINLINE __declspec(noinline)
-
-#elif defined(CUDS_COMPILER_GNUC_LIKE)
-#define CUDS_INLINE static inline
-#define CUDS_FORCE_INLINE static inline __attribute__((always_inline))
+#if defined(CUDS_COMPILER_GNUC_LIKE)
+#define CUDS_INLINE inline
+#define CUDS_FORCE_INLINE inline __attribute__((always_inline))
 #define CUDS_NOINLINE __attribute__((noinline))
 
+#elif defined(CUDS_COMPILER_MSVC)
+#define CUDS_INLINE __inline
+#define CUDS_FORCE_INLINE __forceinline
+#define CUDS_NOINLINE __declspec(noinline)
+
 #else
-#define CUDS_INLINE static
-#define CUDS_FORCE_INLINE static
+#define CUDS_INLINE inline
+#define CUDS_FORCE_INLINE inline
 #define CUDS_NOINLINE
 #endif
+
 
 /** 
  * Portable attributes helpers.
