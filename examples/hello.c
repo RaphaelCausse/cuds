@@ -9,7 +9,7 @@ int main(void)
         return 1;
     }
 
-    printf(
+    printf(     
         "Hello cuds %s !\nBuilt with %s for %s %s",
         cuds_version_string(),
         cuds_compiler(),
@@ -22,6 +22,10 @@ int main(void)
         "\n"
 #endif
     );
+
+#if defined (__STDC_VERSION__)
+    printf("ISO C: %lu\n", __STDC_VERSION__);
+#endif
 
     return 0;
 }
