@@ -2,7 +2,7 @@
  * \file platform.c
  * \package cuds
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Implementations for platform and compiler detection of CUDS library.
+ * \brief Implementations for platform detection of CUDS library.
  *****************************************************************************/
 
 /*****************************************************************************/
@@ -20,11 +20,17 @@ const char *cuds_platform(void)
     return CUDS_PLATFORM_NAME;
 }
 
+const char *cuds_platform_family(void)
+{
+    return CUDS_PLATFORM_FAMILY;
+}
+
 const char *cuds_compiler(void)
 {
-#if defined(CUDS_ENV_MINGW)
-    return CUDS_COMPILER_NAME " (MinGW)";
-#else
     return CUDS_COMPILER_NAME;
-#endif
+}
+
+const char *cuds_arch(void)
+{
+    return CUDS_ARCH_NAME;
 }

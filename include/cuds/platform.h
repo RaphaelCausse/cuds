@@ -2,7 +2,7 @@
  * \file platform.h
  * \package cuds
  * \author Raphael CAUSSE (raphael.causse2@gmail.com)
- * \brief Declarations for platform and compiler detection of CUDS library.
+ * \brief Declarations for platform detection of CUDS library.
  *****************************************************************************/
 
 #ifndef CUDS_PLATFORM_H
@@ -13,14 +13,6 @@
 /*****************************************************************************/
 
 #include "cuds/export.h"
-
-/*****************************************************************************/
-/* LANGUAGE STANDARD */
-/*****************************************************************************/
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ < 199901L)
-#error "CUDS requires at least C99."
-#endif
 
 /*****************************************************************************/
 /* PLATFORM */
@@ -63,24 +55,28 @@
  * \brief Defined only when compiling for FreeBSD.
  */
 #define CUDS_PLATFORM_FREEBSD 1
+#define CUDS_PLATFORM_BSD 1
 #define CUDS_PLATFORM_NAME "freebsd"
 #elif defined(__OpenBSD__)
 /**
  * \brief Defined only when compiling for OpenBSD.
  */
 #define CUDS_PLATFORM_OPENBSD 1
+#define CUDS_PLATFORM_BSD 1
 #define CUDS_PLATFORM_NAME "openbsd"
 #elif defined(__NetBSD__)
 /**
  * \brief Defined only when compiling for NetBSD.
  */
 #define CUDS_PLATFORM_NETBSD 1
+#define CUDS_PLATFORM_BSD 1
 #define CUDS_PLATFORM_NAME "netbsd"
 #elif defined(__DragonFly__)
 /**
  * \brief Defined only when compiling for DragonFlyBSD.
  */
 #define CUDS_PLATFORM_DRAGONFLY 1
+#define CUDS_PLATFORM_BSD 1
 #define CUDS_PLATFORM_NAME "dragonfly"
 
 #elif defined(__unix__) || defined(__unix)
@@ -100,17 +96,6 @@
 
 
 /**
- * Family: BSD.
- */
-#if defined(CUDS_PLATFORM_FREEBSD) || defined(CUDS_PLATFORM_OPENBSD) || \
-    defined(CUDS_PLATFORM_NETBSD)  || defined(CUDS_PLATFORM_DRAGONFLY)
-/**
- * \brief Defined for every BSD-like system.
- */
-#define CUDS_PLATFORM_BSD 1
-#endif
-
-/**
  * Family: POSIX.
  */
 #if defined(CUDS_PLATFORM_LINUX) || defined(CUDS_PLATFORM_APPLE) || \
@@ -120,6 +105,7 @@
  * \brief Defined for every POSIX system.
  */
 #define CUDS_PLATFORM_POSIX 1
+#define CUDS_PLATFORM_FAMILY "posix"
 #endif
 
 /**
@@ -130,6 +116,7 @@
  * \brief Defined for every Win32 system.
  */
 #define CUDS_PLATFORM_WIN32 1
+#define CUDS_PLATFORM_FAMILY "win32"
 #endif
 
 
@@ -140,7 +127,7 @@
 /**
  * \brief Defined when using a MinGW toolchain (CUDS_PLATFORM_WINDOWS is also defined).
  */
-#define CUDS_ENV_MINGW 1
+#define CUDS_MINGW 1
 #endif
 
 
@@ -208,6 +195,73 @@
 #endif
 
 /*****************************************************************************/
+/* ARCHITECTURE */
+/*****************************************************************************/
+
+/**
+ * Platform architecture.
+ */
+#if defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+/**
+ * \brief Defined for x86_64 architecture.
+ */
+#define CUDS_ARCH_X64 1
+#define CUDS_ARCH_NAME "x86_64"
+#define CUDS_ARCH_BITS 64
+
+#elif defined(__i386__) || defined(__i386) || defined(_M_IX86)
+/**
+ * \brief Defined for x86 architecture.
+ */
+#define CUDS_ARCH_X86 1
+#define CUDS_ARCH_NAME "x86"
+#define CUDS_ARCH_BITS 32
+
+#elif defined(__aarch64__) || defined(_M_ARM64)
+/**
+ * \brief Defined for arm64 architecture.
+ */
+#define CUDS_ARCH_ARM64 1
+#define CUDS_ARCH_NAME "arm64"
+#define CUDS_ARCH_BITS 64
+
+#elif defined(__arm__) || defined(_M_ARM)
+/**
+ * \brief Defined for arm architecture
+ */
+#define CUDS_ARCH_ARM 1
+#define CUDS_ARCH_NAME "arm"
+#define CUDS_ARCH_BITS 32
+
+#else
+/**
+ * \brief Defined only for unknown/unsupported architecture.
+ */
+#define CUDS_ARCH_UNKNOWN 1
+#define CUDS_ARCH_NAME "unknown"
+#if defined(__SIZEOF_POINTER__)
+#define CUDS_ARCH_BITS (__SIZEOF_POINTER__ * 8)
+#else
+#define CUDS_ARCH_BITS 0
+#endif
+#endif
+
+/*****************************************************************************/
+/* BYTE ORDER */
+/*****************************************************************************/
+
+#if defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define CUDS_LITTLE_ENDIAN 1
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define CUDS_BIG_ENDIAN 1
+#endif
+
+#elif defined(CUDS_PLATFORM_WINDOWS) || defined(CUDS_ARCH_X86) || defined(CUDS_ARCH_X64)
+#define CUDS_LITTLE_ENDIAN 1
+#endif
+
+/*****************************************************************************/
 /* PORTABLE ATTRIBUTES */
 /*****************************************************************************/
 
@@ -267,11 +321,25 @@ CUDS_EXTERN_C_BEGIN
  */
 CUDS_API const char *cuds_platform(void);
 
+/**
+ * \brief Get the name of the platform family the library was built for.
+ * \return Value of CUDS_PLATFORM_FAMILY, never NULL.
+ * \note With the shared library, this is the platform family of the library,
+ * which * is the one the program runs on.
+ */
+CUDS_API const char *cuds_platform_family(void);
+
 /** 
  * \brief Get the name of the compiler used to build the library.
  * \return Value of CUDS_COMPILER_NAME, never NULL.
  */
 CUDS_API const char *cuds_compiler(void);
+
+/**
+ * \brief Get the name of the CPU architecture the library was built for.
+ * \return Value of CUDS_ARCH_NAME.
+ */
+CUDS_API const char *cuds_arch(void);
 
 CUDS_EXTERN_C_END
 
