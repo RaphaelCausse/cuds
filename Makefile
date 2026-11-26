@@ -59,14 +59,27 @@ REVISION      := $(if $(filter git,$(MISSING_TOOLS)),norevision,$(shell git rev-
 ### Platform detection
 ifeq ($(OS),Windows_NT)
   PLATFORM := windows
+    FAMILY   := win32
 else
   UNAME_S := $(shell uname -s 2>/dev/null)
   ifeq ($(UNAME_S),Linux)
+        FAMILY   := posix
     PLATFORM := linux
+    else ifneq ($(filter MINGW%,$(UNAME_S)),)
+        PLATFORM := windows
+        FAMILY   := win32
+    else ifneq ($(filter CYGWIN_NT%,$(UNAME_S)),)
+        PLATFORM := cygwin
+        FAMILY   := posix
+    else ifneq ($(filter MSYS_NT%,$(UNAME_S)),)
+        PLATFORM := msys
+        FAMILY   := posix
   else ifeq ($(UNAME_S),Darwin)
     PLATFORM := macos
+        FAMILY   := posix
   else
     PLATFORM := unix
+        FAMILY   := posix
   endif
 endif
 
@@ -89,6 +102,16 @@ else ifeq ($(PLATFORM),windows)
   EXE_EXT         := .exe
   SHARED_NAME     := $(NAME).dll
   LDFLAGS_SHARED   = -shared -Wl,--out-implib,$(@D)/lib$(NAME).dll.a
+else ifeq ($(PLATFORM),cygwin)
+    CFLAGS_SHARED   :=
+    EXE_EXT         := .exe
+    SHARED_NAME     := cyg$(NAME)-$(VERSION_MAJOR).dll
+    LDFLAGS_SHARED   = -shared -Wl,--out-implib,$(@D)/lib$(NAME).dll.a
+else ifeq ($(PLATFORM),msys)
+    CFLAGS_SHARED   :=
+    EXE_EXT         := .exe
+    SHARED_NAME     := msys-$(NAME)-$(VERSION_MAJOR).dll
+    LDFLAGS_SHARED   = -shared -Wl,--out-implib,$(@D)/lib$(NAME).dll.a
 else ifeq ($(PLATFORM),macos)
   SHARED_NAME     := lib$(NAME).dylib
   LDFLAGS_SHARED  := -dynamiclib -install_name $(LIBDIR)/$(SHARED_NAME)
@@ -351,15 +374,19 @@ release-shared: __check_conf $(LIB_SHARED_RELEASE)
 
 $(LIB_STATIC_DEBUG): $(OBJ_STATIC_DEBUG)
 	$(RECIPE_AR)
+	@echo ""
 
 $(LIB_STATIC_RELEASE): $(OBJ_STATIC_RELEASE)
 	$(RECIPE_AR)
+	@echo ""
 
 $(LIB_SHARED_DEBUG): $(OBJ_SHARED_DEBUG)
 	$(RECIPE_LD_SHARED)
+	@echo ""
 
 $(LIB_SHARED_RELEASE): $(OBJ_SHARED_RELEASE)
 	$(RECIPE_LD_SHARED)
+	@echo ""
 
 
 #------------------------------------------------------------------------------
@@ -402,35 +429,44 @@ examples-release: __check_conf $(EXAMPLES_RELEASE)
 #------------------------------------------------------------------------------
 .PHONY: __install_headers __install_static __install_shared __install_pkgconfig
 
+### Permissions
+PERM_RW__R := 644
+PERM_RWX_R := 755
+
+### Commands
+INSTALL_DIR := $(INSTALL) -d
+INSTALL_FILE := $(INSTALL) -m $(PERM_RW__R)
+INSTALL_EXEC := $(INSTALL) -m $(PERM_RWX_R)
+
 __install_headers:
-	$(Q)$(INSTALL) -d $(DESTDIR)$(INCLUDEDIR)/$(NAME)
-	@echo "  INSTALL  $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/$(NAME)/"
-	$(Q)$(CP) $(DIR_INCLUDE)/$(NAME)/. $(DESTDIR)$(INCLUDEDIR)/$(NAME)/
+	$(Q)$(INSTALL_DIR) $(DESTDIR)$(INCLUDEDIR)/$(NAME)
+	@echo "  INSTALL  $(NAME) public headers in $(DESTDIR)$(INCLUDEDIR)/$(NAME)/"
+	$(Q)$(INSTALL_FILE) $(DIR_INCLUDE)/$(NAME)/*.h $(DESTDIR)$(INCLUDEDIR)/$(NAME)/
 
 __install_static: release-static
-	$(Q)$(INSTALL) -d $(DESTDIR)$(LIBDIR)
+	$(Q)$(INSTALL_DIR) $(DESTDIR)$(LIBDIR)
 	@echo "  INSTALL  $(NAME) static library in $(DESTDIR)$(LIBDIR)/"
-	$(Q)$(INSTALL) -m 644 $(LIB_STATIC_RELEASE) $(DESTDIR)$(LIBDIR)/
+	$(Q)$(INSTALL_FILE) $(LIB_STATIC_RELEASE) $(DESTDIR)$(LIBDIR)/
 
 ifeq ($(PLATFORM),windows)
 __install_shared: release-shared
-	$(Q)$(INSTALL) -d $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR)
+	$(Q)$(INSTALL_DIR) $(DESTDIR)$(BINDIR) $(DESTDIR)$(LIBDIR)
 	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(BINDIR)/"
-	$(Q)$(INSTALL) -m 755 $(LIB_SHARED_RELEASE) $(DESTDIR)$(BINDIR)/
+	$(Q)$(INSTALL_EXEC) $(LIB_SHARED_RELEASE) $(DESTDIR)$(BINDIR)/
 	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
-	$(Q)$(INSTALL) -m 644 $(DIR_LIB_RELEASE)/lib$(NAME).dll.a $(DESTDIR)$(LIBDIR)/
+	$(Q)$(INSTALL_FILE) $(DIR_LIB_RELEASE)/lib$(NAME).dll.a $(DESTDIR)$(LIBDIR)/
 else
 __install_shared: release-shared
-	$(Q)$(INSTALL) -d $(DESTDIR)$(LIBDIR)
+	$(Q)$(INSTALL_DIR) $(DESTDIR)$(LIBDIR)
 	@echo "  INSTALL  $(NAME) shared library in $(DESTDIR)$(LIBDIR)/"
-	$(Q)$(INSTALL) -m 755 $(LIB_SHARED_RELEASE) $(DESTDIR)$(LIBDIR)/
+	$(Q)$(INSTALL_EXEC) $(LIB_SHARED_RELEASE) $(DESTDIR)$(LIBDIR)/
 	@echo "  INSTALL  $(LIB_SHARED_RELEASE) symlinks"
 	$(Q)$(INSTALL_LINKS)
 endif
 
 __install_pkgconfig:
-	$(Q)$(INSTALL) -d $(DESTDIR)$(PKGCONFIGDIR)
-	@echo "  INSTALL  $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)/"
+	$(Q)$(INSTALL_DIR) $(DESTDIR)$(PKGCONFIGDIR)
+	@echo "  INSTALL  $(NAME) pkgconfig file in $(DESTDIR)$(PKGCONFIGDIR)/"
 	$(Q)printf '%s\n' \
 		'prefix=$(PREFIX)' \
 		'libdir=$(LIBDIR)' \
@@ -441,7 +477,9 @@ __install_pkgconfig:
 		'Version: $(VERSION)' \
 		'Libs: -L$${libdir} -l$(NAME)' \
 		'Cflags: -I$${includedir}' \
-		> $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc
+		> $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc.tmp
+	$(Q)$(INSTALL_FILE) $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc.tmp $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc
+	$(Q)$(RM) $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc.tmp
 
 
 #------------------------------------------------------------------------------
@@ -449,10 +487,10 @@ __install_pkgconfig:
 #------------------------------------------------------------------------------
 .PHONY: install uninstall
 
-install: __install_headers __install_static __install_shared __install_pkgconfig
+install: release __install_headers __install_static __install_shared __install_pkgconfig
 
 uninstall:
-	@echo "  RM  $(NAME) headers in $(DESTDIR)$(INCLUDEDIR)/"
+	@echo "  RM  $(NAME) public headers in $(DESTDIR)$(INCLUDEDIR)/"
 	@$(RMDIR) $(DESTDIR)$(INCLUDEDIR)/$(NAME)
 	@echo "  RM  $(NAME) static library in $(DESTDIR)$(LIBDIR)"
 	@$(RM) $(DESTDIR)$(LIBDIR)/lib$(NAME).a $(DESTDIR)$(LIBDIR)/lib$(NAME).dll.a
@@ -460,7 +498,7 @@ uninstall:
 	@$(RM) $(DESTDIR)$(LIBDIR)/lib$(NAME).so* $(DESTDIR)$(LIBDIR)/lib$(NAME).dylib 
 	@echo "  RM  $(NAME) shared library in $(DESTDIR)$(BINDIR)"
 	@$(RM) $(DESTDIR)$(BINDIR)/$(NAME).dll
-	@echo "  RM  $(NAME) pkgconfig in $(DESTDIR)$(PKGCONFIGDIR)"
+	@echo "  RM  $(NAME) pkgconfig file in $(DESTDIR)$(PKGCONFIGDIR)"
 	@$(RM) $(DESTDIR)$(PKGCONFIGDIR)/$(NAME).pc
 
 
@@ -494,7 +532,7 @@ distclean:
 
 __version:
 	@echo "$(NAME) $(VERSION) ($(REVISION))"
-	@echo "Built for $(PLATFORM)"
+	@echo "Built for $(PLATFORM) ($(FAMILY))"
 	@echo ""
 
 
@@ -528,12 +566,15 @@ info: __version
 
 version: __version
 	@echo "===== MAKE ================================================="
+	@which $(MAKE)
 	@$(MAKE) --version
 	@echo ""
 	@echo "===== CC ==================================================="
+	@which $(CC)
 	@$(CC) --version
 	@echo ""
 	@echo "===== AR ==================================================="
+	@which $(AR)
 	@$(AR) --version
 	@echo ""
 
