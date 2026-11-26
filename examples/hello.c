@@ -10,14 +10,16 @@ int main(void)
     }
 
     printf(     
-        "Hello cuds %s !\nBuilt with %s for %s %s",
+        "Hello cuds %s !\nBuilt with %s for %s (%s %s)%s",
         cuds_version_string(),
         cuds_compiler(),
         cuds_platform(),
+        CUDS_PLATFORM_FAMILY,
+        cuds_arch(),
 #if defined(_CUDS_DEBUG)
-        "in debug mode\n"
+        ", in debug mode.\n"
 #elif defined(_CUDS_RELEASE)
-        "in release mode\n"
+        ", in release mode.\n"
 #else
         "\n"
 #endif
